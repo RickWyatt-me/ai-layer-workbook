@@ -18,6 +18,7 @@
   --accent-bg: rgba(182, 69, 44, 0.08);
   --ok: #3f6b3a;
   --warn: #8a6914;
+  --warn-bg: rgba(138, 105, 20, 0.08);
   --shadow:
     0 1px 0 rgba(31, 26, 20, 0.04), 0 8px 24px -12px rgba(31, 26, 20, 0.12);
   --serif: 'Fraunces', Georgia, serif;
@@ -1202,5 +1203,90 @@ details[open] summary::before {
     border-radius: 0;
     padding: 1rem;
     border: none;
+  }
+}
+
+.repo-fetcher {
+  background: var(--bg-elev);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 1.4rem 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.repo-fetcher h3 {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  margin: 0 0 0.4rem;
+}
+
+.repo-fetcher__intro {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}
+
+.repo-fetcher__status {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: 0.8rem 0 0;
+}
+
+.repo-fetcher__source {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: 0.8rem 0 0;
+}
+
+.repo-fetcher__source a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.repo-fetcher__error {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin: 0.8rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--accent-bg);
+  border-radius: 4px;
+}
+
+.repo-fetcher__warn {
+  font-size: 0.85rem;
+  color: var(--warn);
+  margin: 0.6rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--warn-bg);
+  border-radius: 4px;
+}
+
+.repo-fetcher__link-btn {
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+  padding: 0;
+  margin: 0 0.2rem;
+  font-size: inherit;
+  font-family: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.repo-fetcher__link-btn:hover,
+.repo-fetcher__link-btn:focus-visible {
+  color: var(--accent-soft);
+  outline: none;
+}
+
+.repo-fetcher__hint {
+  font-size: 0.82rem;
+  color: var(--ink-mute);
+  margin: 0.9rem 0 0;
+}
+
+@media (max-width: 600px) {
+  .repo-fetcher {
+    padding: 1rem;
   }
 }

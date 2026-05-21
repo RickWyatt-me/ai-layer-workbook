@@ -33,6 +33,17 @@ export default function PersonaCard() {
     [],
   );
 
+  // Resync local form state when persona changes externally (e.g. RepoFetcher
+  // populates it after a successful GitHub fetch). A user mid-typing during a
+  // fetch will see their input replaced — acceptable because the fetch is
+  // user-initiated and the source is shown above.
+  useEffect(() => {
+    setRepoName(persona.repoName === 'your-repo' ? '' : persona.repoName);
+    setLanguages(persona.languages);
+    setLayout(persona.layout);
+    setTopLevelDirs(persona.topLevelDirs);
+  }, [persona]);
+
   const toggleLanguage = (value: string) => {
     setLanguages((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],

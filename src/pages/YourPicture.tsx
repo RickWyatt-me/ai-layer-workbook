@@ -1,5 +1,6 @@
 import CodeBlock from '../components/CodeBlock';
 import PersonaCard from '../components/PersonaCard';
+import RepoFetcher from '../components/RepoFetcher';
 import { usePersona } from '../hooks/usePersona';
 
 export default function YourPicture() {
@@ -33,6 +34,13 @@ export default function YourPicture() {
         template from here on adapts to what you enter.
       </p>
 
+      <p>
+        Have a GitHub repo for this project? Paste the URL and we'll fill in the
+        fields below from your repo's metadata. Otherwise, fill them in
+        manually.
+      </p>
+
+      <RepoFetcher />
       <PersonaCard />
 
       <h2>What you'll see throughout the workbook</h2>
