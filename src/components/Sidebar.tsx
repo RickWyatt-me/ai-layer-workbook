@@ -9,7 +9,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
   return (
     <aside id="sidebar-nav" className="sidebar" aria-label="Workbook sections">
       <div className="brand">
-        <div>
+        <div className="brand-meta">
           <div className="brand-title">
             The AI Layer
             <br />
@@ -21,7 +21,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
           type="button"
           className="drawer-close icon-btn"
           aria-label="Close navigation menu"
-          onClick={() => onNavigate?.()}
+          onClick={onNavigate}
         >
           ✕
         </button>

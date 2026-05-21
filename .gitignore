@@ -34,3 +34,4 @@ verify-*.png
 .claude/settings.local.json
 .claude/claude-md-review.md
 .claude/.claude-md-review-state
+.claude/scheduled_tasks.lock

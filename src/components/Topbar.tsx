@@ -13,6 +13,7 @@ export default function Topbar({ drawerOpen, onMenuClick }: TopbarProps) {
   return (
     <header className="topbar">
       <button
+        id="menu-btn"
         className="menu-btn"
         type="button"
         aria-label="Open navigation menu"

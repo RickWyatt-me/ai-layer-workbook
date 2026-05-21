@@ -72,9 +72,6 @@ None block v3.0 — revisit if/when they actually hurt.
 - **`vite.config.ts` `build.rollupOptions.output.manualChunks`.** Split
   vendor chunks (react, router, markdown) so the index chunk doesn't churn
   on every app change.
-- **Drawer focus trap on mobile.** `aria-expanded` and Escape-to-close shipped
-  in step 2; a proper focus trap (Tab cycles inside drawer when open) is
-  deferred to step 3.
 
 ## How to promote an item
 

@@ -136,6 +136,7 @@ code {
   font-weight: 500;
 }
 
+/* TODO(C1): the !important + token overrides below assume Prism CSS is loaded — currently it isn't (no import in index.html or main.tsx). Wire Prism when the AI capability lands so these rules activate. */
 pre {
   background: var(--bg-card) !important;
   border: 1px solid var(--rule);
@@ -905,7 +906,7 @@ details[open] summary::before {
   letter-spacing: -0.02em;
 }
 
-/* react: scrim is React-mounted only when drawer is open; base rule is hidden so a stray render on desktop is invisible/non-clickable */
+/* react: scrim diverges from this file's `.shown`-class pattern (used by .nav-check, .glossary-popup) — visibility is gated by React mount/unmount + media query instead. Base rule hides the element so a stray render on desktop is invisible/non-clickable; the mobile @media flips to display:block. */
 .sidebar-scrim {
   display: none;
   position: fixed;
@@ -957,6 +958,9 @@ details[open] summary::before {
   .drawer-close {
     display: inline-flex;
     flex-shrink: 0;
+    /* lift above the inherited .icon-btn 34px so the touch target clears 40px */
+    width: 40px;
+    height: 40px;
   }
   body {
     font-size: 16px;
@@ -976,6 +980,10 @@ details[open] summary::before {
   .topbar-right .picker {
     max-width: 120px;
     font-size: 0.75rem;
+  }
+  /* react: hide the React-only agent picker label on narrow screens so the compressed picker can breathe */
+  .agent-picker-label {
+    display: none;
   }
 }
 
