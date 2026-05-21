@@ -1,11 +1,3 @@
-/*
- * Step-2 minimal layout CSS.
- *
- * Step 3 will REPLACE this entire file with v1's stylesheet ported verbatim
- * from ai-layer-workbook-v1.html. The class names below match v1's so the
- * JSX written in step 2 needs no changes when step 3 lands.
- */
-
 :root {
   --bg: #f4efe6;
   --bg-elev: #faf6ee;
@@ -89,7 +81,6 @@ hr {
   margin: 2.5rem 0;
 }
 
-/* Layout shell */
 .app {
   display: grid;
   grid-template-columns: 280px 1fr;
@@ -232,7 +223,6 @@ hr {
   gap: 0.8rem;
 }
 
-/* v1 UX fix #1 — the agent picker is now labeled */
 .agent-picker {
   display: inline-flex;
   align-items: center;
@@ -358,7 +348,6 @@ hr {
   color: var(--ink);
 }
 
-/* Mobile drawer — step-2 placeholder; step-3 port will refine */
 @media (max-width: 900px) {
   .app {
     grid-template-columns: 1fr;

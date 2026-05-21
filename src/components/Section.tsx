@@ -1,5 +1,5 @@
 import Pager from './Pager';
-import { indexOfSlug, navNumber } from '../data/nav';
+import { NAV_NUMBERS } from '../data/nav';
 
 interface SectionProps {
   slug: string;
@@ -7,10 +7,10 @@ interface SectionProps {
 }
 
 export default function Section({ slug, title }: SectionProps) {
-  const idx = indexOfSlug(slug);
+  const num = NAV_NUMBERS[slug];
   return (
-    <article className="page active" id={`page-${slug}`}>
-      <div className="eyebrow">Section {navNumber(idx)}</div>
+    <article className="page" id={`page-${slug}`}>
+      {num && <div className="eyebrow">Section {num}</div>}
       <h1>{title}</h1>
       <p className="lede">
         Placeholder. The full content for this section will be ported verbatim

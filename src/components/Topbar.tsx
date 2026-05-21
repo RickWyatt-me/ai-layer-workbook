@@ -2,10 +2,11 @@ import { AGENTS, type Agent, useAgent } from '../hooks/useAgent';
 import { useTheme } from '../hooks/useTheme';
 
 interface TopbarProps {
+  drawerOpen: boolean;
   onMenuClick: () => void;
 }
 
-export default function Topbar({ onMenuClick }: TopbarProps) {
+export default function Topbar({ drawerOpen, onMenuClick }: TopbarProps) {
   const { agent, setAgent } = useAgent();
   const { theme, toggleTheme } = useTheme();
 
@@ -15,6 +16,8 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
         className="menu-btn"
         type="button"
         aria-label="Open navigation menu"
+        aria-expanded={drawerOpen}
+        aria-controls="sidebar-nav"
         onClick={onMenuClick}
       >
         ☰

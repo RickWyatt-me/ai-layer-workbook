@@ -47,6 +47,35 @@ Captured here so they don't get lost. Do **not** build during v3.0.
 
 ---
 
+## Performance / tech-debt watch items
+
+These came out of the scaffold + shell port `/code-review` (see
+[`.agents/code-reviews/scaffold-and-shell-port.md`](./.agents/code-reviews/scaffold-and-shell-port.md)).
+None block v3.0 — revisit if/when they actually hurt.
+
+- **Replace `react-router-dom` with a hand-rolled hash router.** ~20 KB
+  gzipped saving. Routes are flat, no loaders, no nesting — we're paying for
+  unused capability. Revisit if bundle blows the <200 KB target.
+- **Lazy-load `react-markdown` + `remark-gfm`.** When C1 ships, import via
+  `React.lazy` / dynamic `import()` so the markdown chunk only loads when an
+  AI panel mounts. Currently tree-shaken to zero, but the moment they're
+  imported eagerly that's ~50–70 KB on every page.
+- **Self-host fonts via `@fontsource-variable/*`.** Google Fonts adds two
+  preconnects and a third-party RTT; self-hosting eliminates that plus
+  fingerprints fonts with the bundle.
+- **Inline theme-init script in `<head>`.** Eliminates the brief light flash
+  for users whose system prefers dark. Read `localStorage` / `matchMedia` and
+  set `data-theme` before React boots.
+- **`matchMedia` listener for OS theme changes.** Currently we snapshot the
+  preference once at first mount. Add a listener so the page tracks OS
+  toggling (with cleanup).
+- **`vite.config.ts` `build.rollupOptions.output.manualChunks`.** Split
+  vendor chunks (react, router, markdown) so the index chunk doesn't churn
+  on every app change.
+- **Drawer focus trap on mobile.** `aria-expanded` and Escape-to-close shipped
+  in step 2; a proper focus trap (Tab cycles inside drawer when open) is
+  deferred to step 3.
+
 ## How to promote an item
 
 When promoting from this list into a real scope:

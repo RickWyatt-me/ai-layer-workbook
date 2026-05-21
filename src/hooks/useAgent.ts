@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { STORAGE_KEYS } from '../lib/storage-keys';
+import { usePersistedEnum } from './usePersistedEnum';
 
 export const AGENTS = [
   'Claude Code',
@@ -10,25 +11,18 @@ export const AGENTS = [
 
 export type Agent = (typeof AGENTS)[number];
 
-const STORAGE_KEY = 'aiLayer.agent';
-
-function initialAgent(): Agent {
-  if (typeof window === 'undefined') return 'Claude Code';
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  return (AGENTS as readonly string[]).includes(stored ?? '')
-    ? (stored as Agent)
-    : 'Claude Code';
+function isAgent(v: string | null): v is Agent {
+  return v !== null && (AGENTS as readonly string[]).includes(v);
 }
 
 export function useAgent(): {
   agent: Agent;
   setAgent: (a: Agent) => void;
 } {
-  const [agent, setAgentState] = useState<Agent>(initialAgent);
-
-  useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, agent);
-  }, [agent]);
-
-  return { agent, setAgent: setAgentState };
+  const [agent, setAgent] = usePersistedEnum(
+    STORAGE_KEYS.agent,
+    isAgent,
+    'Claude Code',
+  );
+  return { agent, setAgent };
 }

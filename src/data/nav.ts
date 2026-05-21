@@ -47,10 +47,16 @@ export const NAV_FLAT: NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
 export const HOME_SLUG = NAV_FLAT[0].slug;
 
-export function indexOfSlug(slug: string): number {
-  return NAV_FLAT.findIndex((item) => item.slug === slug);
+export const NAV_NUMBERS: Record<string, string> = Object.fromEntries(
+  NAV_FLAT.map((item, i) => [item.slug, i.toString().padStart(2, '0')]),
+);
+
+export function nextSlug(slug: string): string | null {
+  const i = NAV_FLAT.findIndex((item) => item.slug === slug);
+  return i >= 0 && i < NAV_FLAT.length - 1 ? NAV_FLAT[i + 1].slug : null;
 }
 
-export function navNumber(index: number): string {
-  return index.toString().padStart(2, '0');
+export function prevSlug(slug: string): string | null {
+  const i = NAV_FLAT.findIndex((item) => item.slug === slug);
+  return i > 0 ? NAV_FLAT[i - 1].slug : null;
 }
