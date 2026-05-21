@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import Section from './components/Section';
 import ScrollToTop from './components/ScrollToTop';
+import GlossaryPopup from './components/GlossaryPopup';
 import { HOME_SLUG, NAV_FLAT } from './data/nav';
 
 const FOCUSABLE_SELECTOR = 'button, a[href], [tabindex]:not([tabindex="-1"])';
@@ -63,43 +64,45 @@ function Shell() {
   }, []);
 
   return (
-    <div className={`app${drawerOpen ? ' drawer-open' : ''}`}>
-      <Sidebar onNavigate={() => setDrawerOpen(false)} />
-      <div className="main-wrap">
-        <Topbar
-          drawerOpen={drawerOpen}
-          onMenuClick={() => setDrawerOpen((v) => !v)}
-        />
-        <main className="main">
-          <Routes>
-            <Route
-              path="/"
-              element={<Navigate to={`/${HOME_SLUG}`} replace />}
-            />
-            {NAV_FLAT.map((item) => (
+    <GlossaryPopup>
+      <div className={`app${drawerOpen ? ' drawer-open' : ''}`}>
+        <Sidebar onNavigate={() => setDrawerOpen(false)} />
+        <div className="main-wrap">
+          <Topbar
+            drawerOpen={drawerOpen}
+            onMenuClick={() => setDrawerOpen((v) => !v)}
+          />
+          <main className="main">
+            <Routes>
               <Route
-                key={item.slug}
-                path={`/${item.slug}`}
-                element={<Section slug={item.slug} title={item.title} />}
+                path="/"
+                element={<Navigate to={`/${HOME_SLUG}`} replace />}
               />
-            ))}
-            <Route
-              path="*"
-              element={<Navigate to={`/${HOME_SLUG}`} replace />}
-            />
-          </Routes>
-        </main>
+              {NAV_FLAT.map((item) => (
+                <Route
+                  key={item.slug}
+                  path={`/${item.slug}`}
+                  element={<Section slug={item.slug} />}
+                />
+              ))}
+              <Route
+                path="*"
+                element={<Navigate to={`/${HOME_SLUG}`} replace />}
+              />
+            </Routes>
+          </main>
+        </div>
+        {drawerOpen && (
+          <button
+            type="button"
+            className="sidebar-scrim"
+            aria-label="Close navigation menu"
+            onClick={() => setDrawerOpen(false)}
+          />
+        )}
+        <ScrollToTop />
       </div>
-      {drawerOpen && (
-        <button
-          type="button"
-          className="sidebar-scrim"
-          aria-label="Close navigation menu"
-          onClick={() => setDrawerOpen(false)}
-        />
-      )}
-      <ScrollToTop />
-    </div>
+    </GlossaryPopup>
   );
 }
 
