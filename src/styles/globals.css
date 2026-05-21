@@ -1,14 +1,38 @@
-/* Placeholder. The full v1 stylesheet will be ported here verbatim in step 3. */
+/*
+ * Step-2 minimal layout CSS.
+ *
+ * Step 3 will REPLACE this entire file with v1's stylesheet ported verbatim
+ * from ai-layer-workbook-v1.html. The class names below match v1's so the
+ * JSX written in step 2 needs no changes when step 3 lands.
+ */
 
 :root {
   --bg: #f4efe6;
   --bg-elev: #faf6ee;
+  --bg-card: #fffbf3;
   --ink: #1f1a14;
   --ink-soft: #5a5048;
+  --ink-mute: #8a7f73;
+  --rule: #d9cfbe;
+  --rule-soft: #e8decc;
   --accent: #b6452c;
+  --accent-bg: rgba(182, 69, 44, 0.08);
   --serif: 'Fraunces', Georgia, serif;
   --body: 'Newsreader', Georgia, serif;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+[data-theme='dark'] {
+  --bg: #13110e;
+  --bg-elev: #1b1814;
+  --bg-card: #221e18;
+  --ink: #f0ebe0;
+  --ink-soft: #bdb4a4;
+  --ink-mute: #857c6e;
+  --rule: #2e2922;
+  --rule-soft: #241f19;
+  --accent: #e67a5c;
+  --accent-bg: rgba(230, 122, 92, 0.1);
 }
 
 * {
@@ -25,4 +49,340 @@ body {
   font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0;
+}
+
+h1 {
+  font-size: 2.6rem;
+  line-height: 1.05;
+  font-weight: 400;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  background: var(--accent-bg);
+  color: var(--accent);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 2.5rem 0;
+}
+
+/* Layout shell */
+.app {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg-elev);
+  border-right: 1px solid var(--rule);
+  padding: 1.5rem 1.2rem 2rem;
+}
+
+.brand {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.brand-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.4rem;
+  line-height: 1.1;
+}
+
+.brand-sub {
+  font-size: 0.72rem;
+  color: var(--ink-mute);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 0.4rem;
+}
+
+.nav-section {
+  margin-bottom: 1rem;
+}
+
+.nav-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  padding: 0 0.4rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 4px;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+  line-height: 1.3;
+}
+
+.nav-item:hover {
+  background: var(--rule-soft);
+  color: var(--ink);
+}
+
+.nav-item.active {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.nav-num {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 0.78rem;
+  width: 1.4rem;
+  flex-shrink: 0;
+  color: var(--ink-mute);
+}
+
+.nav-item.active .nav-num {
+  color: var(--accent);
+}
+
+.tag {
+  display: inline-block;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  background: var(--rule-soft);
+  color: var(--ink-mute);
+  margin-left: 0.4rem;
+  vertical-align: 1px;
+}
+
+.main-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  padding: 0.7rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 10;
+}
+
+.menu-btn {
+  display: none;
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  padding: 0.4rem 0.55rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+/* v1 UX fix #1 — the agent picker is now labeled */
+.agent-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.agent-picker-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 600;
+}
+
+.picker {
+  font-family: var(--body);
+  font-size: 0.82rem;
+  background: var(--bg-elev);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.icon-btn {
+  background: var(--bg-elev);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  width: 34px;
+  height: 34px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.icon-btn:hover {
+  background: var(--accent-bg);
+}
+
+.main {
+  padding: 2.5rem 2rem 6rem;
+}
+
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.eyebrow::before {
+  content: '';
+  display: block;
+  width: 2rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+.lede {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: 1.2rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1rem 0 2rem;
+  max-width: 60ch;
+  font-style: italic;
+}
+
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-top: 2.5rem;
+}
+
+.pager-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: var(--ink-soft);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 0.7rem 1rem;
+  text-decoration: none;
+  background: var(--bg-card);
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.pager-prev {
+  text-align: left;
+}
+.pager-next {
+  text-align: right;
+}
+
+.pager-direction {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.pager-title {
+  font-family: var(--serif);
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+/* Mobile drawer — step-2 placeholder; step-3 port will refine */
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: fixed;
+    left: -300px;
+    width: 280px;
+    transition: left 0.2s;
+    z-index: 20;
+  }
+  .app.drawer-open .sidebar {
+    left: 0;
+  }
+  .menu-btn {
+    display: inline-flex;
+  }
+  .main {
+    padding: 2rem 1.2rem 5rem;
+  }
+  .topbar {
+    padding: 0.7rem 1rem;
+  }
+  .agent-picker-label {
+    display: none;
+  }
 }

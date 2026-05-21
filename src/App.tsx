@@ -1,22 +1,56 @@
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
+import {
+  HashRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from 'react-router-dom';
+import Sidebar from './components/Sidebar';
+import Topbar from './components/Topbar';
+import Section from './components/Section';
+import ScrollToTop from './components/ScrollToTop';
+import { HOME_SLUG, NAV_FLAT } from './data/nav';
 
-function Placeholder() {
+function Shell() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const location = useLocation();
+  const currentSlug = location.pathname.replace(/^\//, '') || HOME_SLUG;
+
   return (
-    <main style={{ padding: '2rem', maxWidth: '720px', margin: '0 auto' }}>
-      <p style={{ fontFamily: 'var(--body)', color: 'var(--ink-soft)' }}>
-        Scaffold ready. Shell and content coming in step 2.
-      </p>
-    </main>
+    <div className={`app${drawerOpen ? ' drawer-open' : ''}`}>
+      <Sidebar onNavigate={() => setDrawerOpen(false)} />
+      <div className="main-wrap">
+        <Topbar onMenuClick={() => setDrawerOpen((v) => !v)} />
+        <main className="main">
+          <Routes>
+            <Route
+              path="/"
+              element={<Navigate to={`/${HOME_SLUG}`} replace />}
+            />
+            {NAV_FLAT.map((item) => (
+              <Route
+                key={item.slug}
+                path={`/${item.slug}`}
+                element={<Section slug={item.slug} title={item.title} />}
+              />
+            ))}
+            <Route
+              path="*"
+              element={<Navigate to={`/${HOME_SLUG}`} replace />}
+            />
+          </Routes>
+        </main>
+      </div>
+      <ScrollToTop key={currentSlug} />
+    </div>
   );
 }
 
 export default function App() {
   return (
     <HashRouter>
-      <Routes>
-        <Route path="/" element={<Placeholder />} />
-        <Route path="*" element={<Placeholder />} />
-      </Routes>
+      <Shell />
     </HashRouter>
   );
 }

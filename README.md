@@ -59,7 +59,7 @@ workbook teaches. Clone the repo and it works — no extra install. Pieces:
 - **`.claude/settings.json`** — wires the Stop hook.
 
 The Stop hook is currently **inert** until at least one sub-directory has its
-own `CLAUDE.md` — by design, it watches the CLAUDE.md *hierarchy* and noops
+own `CLAUDE.md` — by design, it watches the CLAUDE.md _hierarchy_ and noops
 when only the root is present. As `src/CLAUDE.md`, `Docs/CLAUDE.md` (etc.) land,
 it'll start proposing updates whenever a session's changes drift from what those
 files say.
