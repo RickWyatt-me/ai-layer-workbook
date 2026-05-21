@@ -99,8 +99,8 @@ export default function PersonaCard() {
                 value={opt.value}
                 checked={languages.includes(opt.value)}
                 onChange={() => toggleLanguage(opt.value)}
-              />{' '}
-              {opt.label}
+              />
+              <span>{opt.label}</span>
             </label>
           ))}
         </div>
