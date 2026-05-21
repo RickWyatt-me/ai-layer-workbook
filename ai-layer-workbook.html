@@ -1,0 +1,2274 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>The AI Layer Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Newsreader:opsz,wght@6..72,300..600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4EFE6;
+  --bg-elev:#FAF6EE;
+  --bg-card:#FFFBF3;
+  --ink:#1F1A14;
+  --ink-soft:#5A5048;
+  --ink-mute:#8A7F73;
+  --rule:#D9CFBE;
+  --rule-soft:#E8DECC;
+  --accent:#B6452C;
+  --accent-soft:#D67B5F;
+  --accent-bg:rgba(182,69,44,0.08);
+  --ok:#3F6B3A;
+  --warn:#8A6914;
+  --shadow:0 1px 0 rgba(31,26,20,0.04),0 8px 24px -12px rgba(31,26,20,0.12);
+  --serif:'Fraunces',Georgia,serif;
+  --body:'Newsreader',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+[data-theme="dark"]{
+  --bg:#13110E;
+  --bg-elev:#1B1814;
+  --bg-card:#221E18;
+  --ink:#F0EBE0;
+  --ink-soft:#BDB4A4;
+  --ink-mute:#857C6E;
+  --rule:#2E2922;
+  --rule-soft:#241F19;
+  --accent:#E67A5C;
+  --accent-soft:#C46347;
+  --accent-bg:rgba(230,122,92,0.10);
+  --shadow:0 1px 0 rgba(0,0,0,0.3),0 8px 24px -12px rgba(0,0,0,0.5);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","ss02","liga","kern"}
+body{min-height:100vh}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 30%,transparent);transition:border-color .15s}
+a:hover{border-bottom-color:var(--accent)}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:500;letter-spacing:-0.01em;color:var(--ink);margin:0}
+h1{font-size:clamp(2rem,4.5vw,3.2rem);line-height:1.05;font-weight:400;font-variation-settings:"opsz" 120}
+h2{font-size:clamp(1.5rem,3vw,2.1rem);line-height:1.15;font-weight:500;font-variation-settings:"opsz" 48;margin:2.5rem 0 1rem}
+h3{font-size:1.2rem;line-height:1.3;font-weight:600;margin:1.8rem 0 .6rem;color:var(--ink)}
+h4{font-size:1rem;font-weight:600;font-family:var(--body);margin:1.2rem 0 .3rem;letter-spacing:.02em;text-transform:uppercase;color:var(--ink-soft);font-size:.78rem}
+p{margin:0 0 1rem}
+hr{border:0;border-top:1px solid var(--rule);margin:2.5rem 0}
+code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:0.1em 0.35em;border-radius:3px;font-weight:500}
+pre{background:var(--bg-card)!important;border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.1rem;overflow-x:auto;margin:1rem 0;position:relative;font-size:.82rem;line-height:1.6}
+pre code{background:none;color:var(--ink);padding:0;font-size:inherit;font-weight:400}
+.copy-btn{position:absolute;top:.5rem;right:.5rem;background:var(--bg-elev);border:1px solid var(--rule);color:var(--ink-soft);padding:.25rem .55rem;font-family:var(--body);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;cursor:pointer;opacity:0;transition:opacity .15s,background .15s,color .15s}
+pre:hover .copy-btn,pre:focus-within .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.copy-btn.copied{background:var(--ok);color:#fff;border-color:var(--ok);opacity:1}
+
+/* layout */
+.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--bg-elev);border-right:1px solid var(--rule);padding:1.5rem 1.2rem 2rem;display:flex;flex-direction:column}
+.brand{margin-bottom:1.5rem;padding-bottom:1.2rem;border-bottom:1px solid var(--rule)}
+.brand-title{font-family:var(--serif);font-weight:400;font-size:1.4rem;line-height:1.1;font-variation-settings:"opsz" 144;color:var(--ink)}
+.brand-sub{font-size:.72rem;color:var(--ink-mute);letter-spacing:.08em;text-transform:uppercase;margin-top:.4rem;font-family:var(--body)}
+.nav-section{margin-bottom:1rem}
+.nav-label{font-size:.65rem;font-family:var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-mute);font-weight:600;margin-bottom:.5rem;padding:0 .4rem}
+.nav-item{display:flex;align-items:center;gap:.55rem;padding:.45rem .55rem;border-radius:4px;color:var(--ink-soft);font-size:.88rem;cursor:pointer;transition:background .12s,color .12s;border:none;background:none;width:100%;text-align:left;font-family:var(--body);line-height:1.3}
+.nav-item:hover{background:var(--rule-soft);color:var(--ink)}
+.nav-item.active{background:var(--accent-bg);color:var(--accent)}
+.nav-num{font-family:var(--serif);font-variation-settings:"opsz" 9;font-weight:600;font-size:.78rem;width:1.4rem;flex-shrink:0;color:var(--ink-mute)}
+.nav-item.active .nav-num{color:var(--accent)}
+.nav-check{flex-shrink:0;margin-left:auto;font-size:.85rem;color:var(--ok);opacity:0;transition:opacity .15s}
+.nav-check.shown{opacity:1}
+
+.main-wrap{display:flex;flex-direction:column;min-width:0}
+.topbar{position:sticky;top:0;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:.7rem 2rem;display:flex;align-items:center;gap:1rem;z-index:10}
+.menu-btn{display:none;background:none;border:1px solid var(--rule);color:var(--ink);padding:.4rem .55rem;border-radius:4px;cursor:pointer;font-size:1rem;line-height:1}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.6rem}
+.picker{font-family:var(--body);font-size:.82rem;background:var(--bg-elev);color:var(--ink);border:1px solid var(--rule);padding:.35rem .6rem;border-radius:4px;cursor:pointer}
+.icon-btn{background:var(--bg-elev);border:1px solid var(--rule);color:var(--ink);width:34px;height:34px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background .12s}
+.icon-btn:hover{background:var(--accent-bg)}
+
+.main{padding:2.5rem 2rem 6rem;max-width:none}
+.page{display:none;max-width:760px;margin:0 auto;animation:fadeIn .25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.eyebrow{font-family:var(--body);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:.6rem;display:flex;align-items:center;gap:.6rem}
+.eyebrow::before{content:"";display:block;width:2rem;height:1px;background:var(--accent)}
+.lede{font-family:var(--serif);font-weight:300;font-variation-settings:"opsz" 32;font-size:1.3rem;line-height:1.45;color:var(--ink-soft);margin:1rem 0 2rem;max-width:60ch;font-style:italic}
+
+.callout{background:var(--bg-card);border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.2rem;margin:1.5rem 0}
+.callout-title{font-family:var(--body);font-weight:600;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+.callout p:last-child{margin-bottom:0}
+.callout.ok{border-left-color:var(--ok)}
+.callout.ok .callout-title{color:var(--ok)}
+.callout.warn{border-left-color:var(--warn)}
+.callout.warn .callout-title{color:var(--warn)}
+
+.kvgrid{display:grid;grid-template-columns:auto 1fr;gap:.5rem 1.2rem;font-size:.92rem;margin:1rem 0}
+.kvgrid dt{font-weight:600;color:var(--ink)}
+.kvgrid dd{margin:0;color:var(--ink-soft)}
+
+.table-wrap{overflow-x:auto;margin:1.2rem 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--body);font-weight:600;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute);background:var(--bg-elev)}
+
+.checklist{list-style:none;padding:0;margin:1rem 0}
+.checklist li{display:flex;align-items:flex-start;gap:.7rem;padding:.55rem 0;border-bottom:1px dashed var(--rule-soft)}
+.checklist input[type=checkbox]{margin-top:.4rem;accent-color:var(--accent);width:1.05rem;height:1.05rem;flex-shrink:0;cursor:pointer}
+.checklist label{cursor:pointer;flex:1}
+.checklist li.done label{color:var(--ink-mute);text-decoration:line-through}
+
+.tag{display:inline-block;background:var(--accent-bg);color:var(--accent);font-size:.7rem;font-family:var(--body);letter-spacing:.06em;text-transform:uppercase;padding:.18rem .5rem;border-radius:3px;font-weight:600;margin-right:.4rem}
+.tag.gray{background:var(--rule-soft);color:var(--ink-mute)}
+.tag.ok{background:rgba(63,107,58,.12);color:var(--ok)}
+
+details{border:1px solid var(--rule);border-radius:6px;padding:.7rem 1rem;margin:1rem 0;background:var(--bg-card)}
+details[open]{padding-bottom:1rem}
+summary{cursor:pointer;font-weight:600;font-family:var(--body);font-size:.92rem;color:var(--ink);outline:none;list-style:none;display:flex;align-items:center;gap:.5rem}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+";font-family:var(--serif);font-weight:400;font-size:1.2rem;color:var(--accent);width:1rem;display:inline-block;transition:transform .15s}
+details[open] summary::before{content:"−"}
+
+.glossary-term{border-bottom:1px dashed var(--accent);cursor:help;color:var(--ink)}
+.glossary-popup{position:fixed;background:var(--bg-card);border:1px solid var(--rule);border-radius:6px;padding:.9rem 1.1rem;max-width:280px;box-shadow:var(--shadow);font-size:.85rem;line-height:1.5;z-index:100;display:none;pointer-events:none}
+.glossary-popup strong{display:block;font-family:var(--serif);font-weight:600;margin-bottom:.3rem;color:var(--accent)}
+.glossary-popup.shown{display:block;pointer-events:auto}
+
+.persona-card{background:var(--bg-card);border:1px solid var(--rule);border-radius:8px;padding:1.4rem 1.5rem;margin:1.5rem 0;position:relative}
+.persona-card h3{margin-top:0}
+.persona-field{margin-bottom:.9rem}
+.persona-field label{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-mute);font-weight:600;margin-bottom:.3rem;font-family:var(--body)}
+.persona-field input,.persona-field textarea,.persona-field select{width:100%;font-family:var(--body);font-size:.92rem;padding:.5rem .7rem;background:var(--bg-elev);border:1px solid var(--rule);color:var(--ink);border-radius:4px}
+.persona-field input:focus,.persona-field textarea:focus,.persona-field select:focus{outline:none;border-color:var(--accent)}
+.persona-field textarea{font-family:var(--mono);font-size:.78rem;min-height:90px;resize:vertical}
+.lang-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.5rem}
+.lang-grid label{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--ink);background:var(--bg-elev);border:1px solid var(--rule);padding:.45rem .6rem;border-radius:4px;cursor:pointer;font-family:var(--body);text-transform:none;letter-spacing:0}
+.lang-grid label:has(input:checked){background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+.lang-grid input{accent-color:var(--accent);margin:0}
+.btn{display:inline-block;background:var(--accent);color:#fff;border:none;font-family:var(--body);font-weight:600;font-size:.85rem;letter-spacing:.04em;padding:.55rem 1.1rem;border-radius:4px;cursor:pointer;transition:background .12s}
+.btn:hover{background:var(--accent-soft)}
+.btn.ghost{background:none;color:var(--accent);border:1px solid var(--accent)}
+.btn.ghost:hover{background:var(--accent-bg)}
+
+.phase-meta{display:flex;flex-wrap:wrap;gap:1.2rem;margin:1.2rem 0 2rem;font-size:.82rem;color:var(--ink-soft);padding:.7rem 1rem;background:var(--bg-elev);border-radius:6px;border-left:3px solid var(--accent)}
+.phase-meta span{display:flex;gap:.3rem;align-items:center}
+.phase-meta strong{color:var(--ink);font-family:var(--body);font-weight:600}
+
+.pager{display:flex;justify-content:space-between;gap:1rem;margin-top:4rem;padding-top:2rem;border-top:1px solid var(--rule)}
+.pager a{flex:1;padding:1rem 1.2rem;background:var(--bg-card);border:1px solid var(--rule);border-radius:6px;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none;font-family:var(--body);transition:background .12s,border-color .12s}
+.pager a:hover{background:var(--accent-bg);border-color:var(--accent)}
+.pager a.next{text-align:right}
+.pager .pager-label{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-mute);display:block;margin-bottom:.2rem}
+.pager .pager-title{font-family:var(--serif);font-weight:500;font-size:1rem;color:var(--ink)}
+
+.origin-block{background:var(--bg-card);border:1px solid var(--rule);border-radius:8px;padding:1.5rem 1.7rem;margin:2rem 0;font-size:.95rem;line-height:1.65}
+.origin-block h3{margin-top:0;font-family:var(--serif);font-weight:500;font-variation-settings:"opsz" 48;color:var(--accent)}
+.origin-block ul{padding-left:1.2rem;margin:.5rem 0 0}
+.origin-block li{margin-bottom:.35rem;color:var(--ink-soft)}
+
+.section-num{font-family:var(--serif);font-variation-settings:"opsz" 144;font-weight:300;font-size:3.5rem;line-height:1;color:var(--accent);opacity:.6;margin-bottom:.5rem;display:block;letter-spacing:-.02em}
+
+/* mobile */
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;top:0;left:0;width:280px;z-index:50;transform:translateX(-100%);transition:transform .2s ease;box-shadow:8px 0 24px -8px rgba(0,0,0,.2)}
+  .sidebar.open{transform:translateX(0)}
+  .menu-btn{display:block}
+  .main{padding:1.5rem 1.2rem 5rem}
+  .topbar{padding:.6rem 1rem}
+  .sidebar-scrim{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40;display:none}
+  .sidebar-scrim.shown{display:block}
+  body{font-size:16px}
+  pre{font-size:.78rem}
+  .section-num{font-size:2.5rem}
+  .lede{font-size:1.15rem}
+  .pager{flex-direction:column}
+  .topbar-right .picker{max-width:120px;font-size:.75rem}
+}
+
+/* dark prism overrides */
+[data-theme="dark"] pre{background:#1A1814!important;border-color:var(--rule)}
+[data-theme="dark"] .token.comment{color:#857C6E}
+[data-theme="dark"] .token.string{color:#E6B176}
+[data-theme="dark"] .token.keyword{color:#E67A5C}
+[data-theme="dark"] .token.function{color:#C9A063}
+[data-theme="dark"] .token.number{color:#D67B5F}
+[data-theme="dark"] code{background:rgba(230,122,92,.12)}
+
+[data-theme="light"] .token.comment{color:#8A7F73;font-style:italic}
+[data-theme="light"] .token.string{color:#8A5A20}
+[data-theme="light"] .token.keyword{color:#B6452C}
+[data-theme="light"] .token.function{color:#6B4220}
+[data-theme="light"] .token.number{color:#B6452C}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-title">The AI Layer<br>Workbook</div>
+    <div class="brand-sub">A field guide · v1.0</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Orientation</div>
+    <button class="nav-item" data-page="start"><span class="nav-num">00</span><span>Start here</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="mental-models"><span class="nav-num">01</span><span>Mental models</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="how-it-works"><span class="nav-num">02</span><span>How Claude Code works</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="your-picture"><span class="nav-num">03</span><span>Your codebase picture</span><span class="nav-check">✓</span></button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Implementation</div>
+    <button class="nav-item" data-page="phase-1"><span class="nav-num">04</span><span>Phase 1 — Foundation</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="phase-2"><span class="nav-num">05</span><span>Phase 2 — Discovery</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="phase-3"><span class="nav-num">06</span><span>Phase 3 — Sub-CLAUDE.mds</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="phase-4"><span class="nav-num">07</span><span>Phase 4 — LSP</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="phase-5"><span class="nav-num">08</span><span>Phase 5 — Skills</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="phase-6"><span class="nav-num">09</span><span>Phase 6 — Hooks</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="phase-7"><span class="nav-num">10</span><span>Phase 7 — Subagent</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="phase-8"><span class="nav-num">11</span><span>Phase 8 — MCP <span class="tag gray">advanced</span></span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="phase-9"><span class="nav-num">12</span><span>Phase 9 — Plugin</span><span class="nav-check">✓</span></button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Reference</div>
+    <button class="nav-item" data-page="maintenance"><span class="nav-num">13</span><span>Maintenance</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="prompt-library"><span class="nav-num">14</span><span>Prompt library</span><span class="nav-check">✓</span></button>
+    <button class="nav-item" data-page="glossary"><span class="nav-num">15</span><span>Glossary</span><span class="nav-check">✓</span></button>
+  </div>
+</aside>
+<div class="sidebar-scrim" id="scrim"></div>
+
+<div class="main-wrap">
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+  <div class="topbar-right">
+    <select class="picker" id="agentPicker" title="Your coding agent">
+      <option value="Claude Code">Claude Code</option>
+      <option value="Codex">Codex</option>
+      <option value="Cursor">Cursor</option>
+      <option value="Cline">Cline</option>
+      <option value="your agent">Other</option>
+    </select>
+    <button class="icon-btn" id="themeBtn" aria-label="Theme" title="Toggle theme">◐</button>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- ============ 00 START HERE ============ -->
+<section class="page" id="page-start">
+  <span class="section-num">00</span>
+  <div class="eyebrow">Begin here</div>
+  <h1>The AI Layer Workbook</h1>
+  <p class="lede">A step-by-step, plain-language guide to setting up Claude Code in a large codebase — built for people who can ship without being career engineers.</p>
+
+  <p>Most articles about getting AI to work in real codebases assume you already speak engineer. This one doesn't. It walks you through the same setup the best teams use — but with analogies, copy-paste templates, and prompts you hand to your own coding agent to do the heavy work for you.</p>
+
+  <p>Each phase has the same shape: <strong>why it matters</strong>, <strong>what you'll have at the end</strong>, <strong>concrete steps</strong>, <strong>copy-paste blocks</strong>, and a <strong>verify it worked</strong> section. Check items off as you go — your progress is saved in your browser.</p>
+
+  <h2>How to use this workbook</h2>
+  <ol>
+    <li>Read the three <strong>Orientation</strong> pages first. They give you the mental model — none of the implementation steps will land without them.</li>
+    <li>Fill in the <strong>Personalize</strong> panel on the next page. The whole workbook adapts to your repo.</li>
+    <li>Work through the nine <strong>Implementation</strong> phases in order. Each one takes 30 minutes to a couple of hours.</li>
+    <li>Don't write CLAUDE.md files, hooks, or skills by hand. Use the prompts in this workbook — your own coding agent will do the work on your machine.</li>
+  </ol>
+
+  <div class="callout">
+    <div class="callout-title">A note before you start</div>
+    <p>This workbook teaches the Claude Code conventions — CLAUDE.md, hooks, skills, plugins. But the work of <em>setting them up</em> can be done by whatever coding agent you already use. Use the picker in the top bar to set your agent; the wording adapts.</p>
+  </div>
+
+  <div class="origin-block">
+    <h3>Origins &amp; credit</h3>
+    <p>This guide stands on the work of <a href="https://dynamous.ai" target="_blank" rel="noopener">Cole Medin</a> and the <a href="https://dynamous.ai" target="_blank" rel="noopener">Dynamous</a> community of AI builders. Cole's <a href="https://youtu.be/efRIrLXoOVA?si=Pn8Dzw-7DwfmPq5V" target="_blank" rel="noopener">YouTube walkthrough</a> took Anthropic's article <a href="https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start" target="_blank" rel="noopener">"How Claude Code works in large codebases"</a> and turned it into a working reference codebase — the <a href="https://github.com/coleam00/helpline" target="_blank" rel="noopener">helpline repo</a>. Every pattern in this workbook is concrete because of that repo.</p>
+    <p>I built this for myself, to make implementation easier and to translate the technical pieces into something I could confidently execute. I quickly realised others might want the same. If that's you — welcome. The substance is Cole and Anthropic's; the angle here is just <em>plain-language, one-step-at-a-time</em>.</p>
+    <p><strong>Want to go deeper with people doing this work full-time?</strong> Join us at <a href="https://dynamous.ai" target="_blank" rel="noopener">Dynamous</a>.</p>
+    <ul>
+      <li>Cole's video: <a href="https://youtu.be/efRIrLXoOVA?si=Pn8Dzw-7DwfmPq5V" target="_blank" rel="noopener">How Claude Code Works in Large Codebases</a></li>
+      <li>Anthropic article: <a href="https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start" target="_blank" rel="noopener">claude.com/blog/...large-codebases</a></li>
+      <li>Helpline reference repo: <a href="https://github.com/coleam00/helpline" target="_blank" rel="noopener">github.com/coleam00/helpline</a></li>
+      <li>Dynamous community: <a href="https://dynamous.ai" target="_blank" rel="noopener">dynamous.ai</a></li>
+    </ul>
+  </div>
+
+  <div class="pager"><span></span><a class="next" data-page="mental-models"><span class="pager-label">Next →</span><span class="pager-title">01. Mental models</span></a></div>
+</section>
+
+<!-- ============ 01 MENTAL MODELS ============ -->
+<section class="page" id="page-mental-models">
+  <span class="section-num">01</span>
+  <div class="eyebrow">Concepts before code</div>
+  <h1>Mental models</h1>
+  <p class="lede">Seven analogies that let you reason about every piece of an AI Layer without knowing the technical names yet.</p>
+
+  <h2>The AI Layer itself</h2>
+  <p>Think of your codebase as a giant warehouse. Without help, every visitor — even an experienced one — wastes time finding the right aisle, asking where things are, and bumping into rules they didn't know existed.</p>
+  <p>The <strong>AI Layer</strong> is the signage, the floor map, the staff handbook, and the badge-access system — all bolted onto the warehouse so anyone walking in (human or AI) can get useful work done quickly without breaking things. The warehouse is your codebase. The AI Layer is what makes it navigable.</p>
+
+  <h2>CLAUDE.md — the team handbook</h2>
+  <p>A <span class="glossary-term" data-term="CLAUDE.md">CLAUDE.md</span> file is a short handbook for one part of your codebase. The handbook at the top of the warehouse covers company-wide rules: how we measure things, what departments exist. Handbooks in each department cover only that department's rules: how the billing team handles refunds, what the shipping team does with damaged goods.</p>
+  <p>The agent reads the top-level handbook first, then loads the relevant department handbook when it walks into that department. It never carries every handbook at once — that would be exhausting and most of them aren't relevant.</p>
+
+  <h2>Hooks — automatic doors</h2>
+  <p><span class="glossary-term" data-term="Hook">Hooks</span> are like automatic doors that fire when you cross a sensor. You don't ask them to open — they just do, at moments you've defined. A <code>SessionStart</code> hook is the door at the entrance ("welcome, here's today's floor map"). A <code>Stop</code> hook is the door at the exit ("what just happened on this visit — anything we should add to the handbook?"). They run on their own. You configure them once.</p>
+
+  <h2>Skills — consultants on retainer</h2>
+  <p>A <span class="glossary-term" data-term="Skill">skill</span> is a specialist consultant who only shows up when their expertise is relevant. You wouldn't bring a tax attorney to every meeting; you'd call them when there's a tax question. Skills are scoped: the billing-specialist skill activates when the agent works in the billing department, and stays out of the way otherwise. This keeps the agent's "brain" — its context — from being cluttered with advice it doesn't need right now.</p>
+
+  <h2>Subagents — scouts</h2>
+  <p>A <span class="glossary-term" data-term="Subagent">subagent</span> is a scout you send ahead. Before your main party (the editing agent) descends into an unfamiliar part of the warehouse, you dispatch a scout — read-only, can't break anything, just observes — to map the area and report back. The scout returns with a clean report; the main agent then enters with the full picture instead of using up its own attention on discovery. Map first, then act.</p>
+
+  <h2>LSP — GPS for code</h2>
+  <p>The <span class="glossary-term" data-term="LSP">Language Server Protocol</span> is GPS for your codebase. Without it, the agent searches for things by name (text matching) — like trying to find a specific "Main Street" by reading every street sign in every city. With it, the agent navigates by coordinates — actual definitions and references — so it finds the right thing the first time. This is the single highest-leverage upgrade for big codebases.</p>
+
+  <h2>MCP — USB ports for Claude</h2>
+  <p>An <span class="glossary-term" data-term="MCP">MCP server</span> is a standard way to plug external tools into your agent. Think USB ports: any device that speaks USB can plug into any computer. Any tool that speaks MCP can plug into Claude Code. A search engine for your codebase, a connection to your ticket system, a custom analytics query — all become tools the agent can call.</p>
+
+  <h2>Plugins — app installs</h2>
+  <p>A <span class="glossary-term" data-term="Plugin">plugin</span> bundles a set of skills, hooks, and MCP servers into one installable package. Like installing an app on your phone: one tap, and everything comes with it pre-wired. When a teammate joins your project, they install your team's plugin and get the same setup you have — no manual copying of files.</p>
+
+  <hr>
+  <p><strong>Carry these analogies with you.</strong> Every implementation phase in this workbook maps back to one of them. If you ever get confused mid-phase, come back here.</p>
+
+  <div class="pager"><a data-page="start"><span class="pager-label">← Previous</span><span class="pager-title">00. Start here</span></a><a class="next" data-page="how-it-works"><span class="pager-label">Next →</span><span class="pager-title">02. How Claude Code works</span></a></div>
+</section>
+
+<!-- ============ 02 HOW IT WORKS ============ -->
+<section class="page" id="page-how-it-works">
+  <span class="section-num">02</span>
+  <div class="eyebrow">Mechanics</div>
+  <h1>How Claude Code actually works</h1>
+  <p class="lede">No magic. Just a CLI tool that walks your filesystem and runs scripts at specific moments. Once you see the mechanics, the whole AI Layer stops feeling mysterious.</p>
+
+  <h2>What "Claude Code" is, mechanically</h2>
+  <p><strong>Claude Code</strong> is a command-line program you install once on your computer. You open a terminal, navigate to your project folder, and type <code>claude</code>. That starts a <strong>session</strong>: an interactive conversation where you type requests and the agent reads files, runs commands, and edits code on your behalf — all locally, on your machine.</p>
+  <p>Unlike older AI tools that uploaded your entire codebase to a server to be "indexed," Claude Code does nothing of the sort. It works exactly like a careful new engineer would: opens files, greps for things, follows imports, looks at git history. The code never leaves your machine unless you explicitly send it somewhere.</p>
+
+  <h2>What a "session" is</h2>
+  <p>A session starts when you run <code>claude</code> and ends when you close that terminal or run <code>/clear</code>. Inside one session, the agent remembers everything you've discussed and every file it has looked at. Across sessions, it doesn't — each new session starts fresh.</p>
+  <p>This matters because the <strong>CLAUDE.md files</strong> are how the agent gets re-oriented at the start of every new session. Without them, every session starts blind.</p>
+
+  <h2>What "the context" is, and why it matters</h2>
+  <p>The <strong>context</strong> is the agent's short-term memory for the current session — a finite amount of text it can hold at once. Every file it reads, every output of every command, every line of conversation eats into that budget. When the budget gets low, the agent struggles.</p>
+  <p>This is why every design choice in the AI Layer is fundamentally about <strong>context economy</strong>: load only what's relevant <em>right now</em>, defer everything else until it's needed. CLAUDE.md hierarchy, path-scoped skills, read-only subagents — they all exist to spend the context budget wisely.</p>
+
+  <h2>How hooks actually fire</h2>
+  <p>A hook is just a command that Claude Code runs at a moment you've defined. You configure them in a file called <code>.claude/settings.json</code>. Here are the moments that exist:</p>
+  <div class="table-wrap"><table>
+    <tr><th>Hook name</th><th>Fires when…</th><th>Typical use</th></tr>
+    <tr><td><code>SessionStart</code></td><td>You run <code>claude</code> or <code>/clear</code></td><td>Inject orientation (active files, recent commits)</td></tr>
+    <tr><td><code>UserPromptSubmit</code></td><td>You hit Enter on a message</td><td>Add context to your message before it's sent</td></tr>
+    <tr><td><code>PreToolUse</code></td><td>Before the agent runs a tool (e.g. Bash, Edit)</td><td>Block dangerous commands; require confirmation</td></tr>
+    <tr><td><code>PostToolUse</code></td><td>After a tool runs</td><td>Auto-lint after every edit; log changes</td></tr>
+    <tr><td><code>Stop</code></td><td>The agent finishes its current response to you</td><td>Self-improvement: reflect, propose CLAUDE.md updates</td></tr>
+    <tr><td><code>PreCompact</code></td><td>Before the agent compresses old conversation</td><td>Snapshot state before it's summarised away</td></tr>
+  </table></div>
+
+  <h2>What a hook actually receives and returns</h2>
+  <p>Each hook is just a program (a Python script, a shell command — anything). When the hook fires:</p>
+  <ol>
+    <li>Claude Code runs your program.</li>
+    <li>It pipes a JSON payload to your program's <strong>standard input</strong> (the equivalent of typing into the program).</li>
+    <li>Whatever your program writes to <strong>standard output</strong> (its console) gets injected back into the agent's context.</li>
+    <li>Whatever your program writes to <strong>standard error</strong> shows up in the terminal for you to read.</li>
+  </ol>
+  <p>That's it. Hooks aren't magic — they're scripts that run at lifecycle events and can speak to the agent through stdin/stdout. A bash one-liner is a valid hook. A 200-line Python program is also a valid hook. The simplest useful hook is just <code>echo "Today is $(date)"</code>.</p>
+
+  <div class="callout">
+    <div class="callout-title">"Stop" doesn't mean what you'd think</div>
+    <p>"Stop" doesn't mean you closed the terminal. It means the agent finished its current response to your most recent message. The Stop hook fires <strong>every single turn</strong>. So whatever you put there must be cheap, or it must check whether anything actually changed before doing real work — which is exactly what the self-improvement pattern in Phase 6 does.</p>
+  </div>
+
+  <h2>Skills, mechanically</h2>
+  <p>A <strong>skill</strong> is a folder under <code>.claude/skills/</code> containing a <code>SKILL.md</code> file. The first few lines of that file (the "frontmatter") declare a name, a description, and optionally a <code>paths:</code> field — a pattern matching where in your codebase this skill applies.</p>
+  <p>At every turn, Claude Code reads the descriptions of all available skills and decides which ones are relevant. Only relevant skills are loaded into context. A skill scoped to <code>services/billing/**</code> stays dormant until the agent works in <code>services/billing</code>.</p>
+
+  <h2>Subagents, mechanically</h2>
+  <p>A subagent is a second instance of Claude Code launched by the first. It has its own context window — its own short-term memory — separate from the parent. You define it in a single markdown file under <code>.claude/agents/</code>, including which tools it's allowed to use (e.g. only <code>Read</code> and <code>Grep</code>, no <code>Edit</code> or <code>Write</code>). When the parent dispatches the subagent, it does its work, returns a final report, and disappears. The parent receives only the report — not the subagent's reading list.</p>
+
+  <h2>The whole picture, on one page</h2>
+  <p>Here's what happens in a typical session, end to end:</p>
+  <ol>
+    <li>You type <code>claude</code>. <strong>SessionStart hook</strong> fires → prints orientation into context.</li>
+    <li>Claude Code reads the root <strong>CLAUDE.md</strong>. As you work in subfolders, it loads those <strong>CLAUDE.md</strong>s too.</li>
+    <li>You ask for something. <strong>Relevant skills</strong> auto-load based on which files you're touching.</li>
+    <li>The agent reads files. For exact symbol lookups, it uses <strong>LSP</strong>. For structured search, it calls your <strong>MCP</strong> server.</li>
+    <li>For a big unfamiliar area, the agent dispatches the <strong>explorer subagent</strong> first to map it.</li>
+    <li>The agent edits files, runs your tests (filtered by the <strong>scoped-tests</strong> skill), reports back to you.</li>
+    <li><strong>Stop hook</strong> fires → notices what changed, spawns a background reflection that proposes CLAUDE.md updates while context is fresh.</li>
+    <li>You type another request. Loop.</li>
+  </ol>
+  <p>Every piece you build in this workbook hooks into one of those steps.</p>
+
+  <div class="pager"><a data-page="mental-models"><span class="pager-label">← Previous</span><span class="pager-title">01. Mental models</span></a><a class="next" data-page="your-picture"><span class="pager-label">Next →</span><span class="pager-title">03. Your codebase picture</span></a></div>
+</section>
+
+<!-- ============ 03 YOUR PICTURE ============ -->
+<section class="page" id="page-your-picture">
+  <span class="section-num">03</span>
+  <div class="eyebrow">Personalize</div>
+  <h1>Your codebase picture</h1>
+  <p class="lede">Tell the workbook about your repo. Every code snippet, prompt, and template from here on adapts to what you enter.</p>
+
+  <div class="persona-card">
+    <h3>Personalize</h3>
+    <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:1.2rem">Everything stays in your browser. Nothing is sent anywhere. Update anytime.</p>
+
+    <div class="persona-field">
+      <label for="repoName">Repo name</label>
+      <input type="text" id="repoName" placeholder="vox" autocomplete="off">
+    </div>
+
+    <div class="persona-field">
+      <label>Primary languages (select all that apply)</label>
+      <div class="lang-grid" id="langGrid">
+        <label><input type="checkbox" value="swift"> Swift (iOS)</label>
+        <label><input type="checkbox" value="kotlin"> Kotlin (Android)</label>
+        <label><input type="checkbox" value="typescript"> TypeScript</label>
+        <label><input type="checkbox" value="python"> Python</label>
+        <label><input type="checkbox" value="go"> Go</label>
+        <label><input type="checkbox" value="rust"> Rust</label>
+        <label><input type="checkbox" value="java"> Java</label>
+        <label><input type="checkbox" value="csharp"> C#</label>
+        <label><input type="checkbox" value="other"> Other</label>
+      </div>
+    </div>
+
+    <div class="persona-field">
+      <label for="layout">Repo layout</label>
+      <select id="layout">
+        <option value="single">Single repo (everything in one place)</option>
+        <option value="multi">Multi-repo (one repo per service/platform)</option>
+        <option value="mono">Monorepo with packages/services subfolders</option>
+      </select>
+    </div>
+
+    <div class="persona-field">
+      <label for="topLevelDirs">Top-level folders (one per line, optional)</label>
+      <textarea id="topLevelDirs" placeholder="ios&#10;android&#10;shared&#10;docs"></textarea>
+    </div>
+
+    <button class="btn" id="personalizeBtn">Apply &amp; save</button>
+    <span id="personalizeStatus" style="margin-left:1rem;font-size:.85rem;color:var(--ok)"></span>
+  </div>
+
+  <h2>What you'll see throughout the workbook</h2>
+  <p>Once you save, mentions of <code class="tpl-repo">your-repo</code> get replaced with your actual repo name. If you selected Swift and/or Kotlin, the mobile-specific examples become primary. If you provided top-level folders, the file paths in templates reflect them.</p>
+
+  <h2>If you have a native mobile app (iOS + Android)</h2>
+  <p>The default examples assume this shape:</p>
+  <pre><code class="language-bash"><span class="tpl-repo">your-repo</span>/
+├── CLAUDE.md                ← root (lean — pointers only)
+├── .claude/                 ← all AI Layer config lives here
+│   ├── settings.json
+│   ├── skills/
+│   ├── hooks/
+│   └── agents/
+├── .claudeignore            ← what Claude Code shouldn't read
+├── .mcp.json                ← MCP servers wired into this repo
+├── ios/
+│   ├── CLAUDE.md            ← Swift / iOS conventions
+│   └── ...
+├── android/
+│   ├── CLAUDE.md            ← Kotlin / Android conventions
+│   └── ...
+└── docs/</code></pre>
+
+  <h2>If you have something else</h2>
+  <p>Wherever the examples say <code>ios/</code> or <code>android/</code>, substitute your own top-level folder names. The patterns generalise.</p>
+
+  <h2>What's next</h2>
+  <p>The Implementation section has nine phases. They build on each other in order. Don't skip ahead. Phase 1 establishes the foundation everything else sits on.</p>
+
+  <div class="pager"><a data-page="how-it-works"><span class="pager-label">← Previous</span><span class="pager-title">02. How Claude Code works</span></a><a class="next" data-page="phase-1"><span class="pager-label">Next →</span><span class="pager-title">04. Phase 1 — Foundation</span></a></div>
+</section>
+
+<!-- ============ 04 PHASE 1 FOUNDATION ============ -->
+<section class="page" id="page-phase-1">
+  <span class="section-num">04</span>
+  <div class="eyebrow">Phase 1</div>
+  <h1>Foundation</h1>
+  <p class="lede">Three files that give Claude Code a baseline: a high-level orientation, a list of what to ignore, and a list of what it's allowed to do.</p>
+
+  <div class="phase-meta">
+    <span><strong>Time:</strong> ~45 min</span>
+    <span><strong>Prereq:</strong> Claude Code installed</span>
+    <span><strong>Outcome:</strong> Three files in your repo root</span>
+  </div>
+
+  <h2>Why this matters</h2>
+  <p>Without these three files, every session starts with the agent doing the equivalent of asking "where am I, what do you want me to know, and what am I allowed to touch?" That's a context-burning waste. These files answer those questions once, version them in git, and travel with your repo.</p>
+
+  <h2>What you'll have at the end</h2>
+  <ul>
+    <li><code>CLAUDE.md</code> at your repo root — the lean orientation file</li>
+    <li><code>.claudeignore</code> — generated files, lockfiles, build output excluded</li>
+    <li><code>.claude/settings.json</code> — permissions and (later) hooks configured</li>
+  </ul>
+
+  <h2>Step 1 — Create the root CLAUDE.md</h2>
+  <p>The single most important rule: <strong>this file is lean</strong>. It is not a manual. It is not a tutorial. It is repo-wide truths and the 3–5 gotchas that bite everyone, plus pointers to where more lives.</p>
+  <p>Open a terminal in your repo root and create the file:</p>
+
+  <h4>Template — root CLAUDE.md (mobile app)</h4>
+  <pre><code class="language-markdown"># <span class="tpl-repo">your-repo</span>
+
+What this is in one line. (E.g. "Native mobile customer-support app — iOS and Android, shared backend.")
+
+This root file is intentionally lean. It holds only what's true repo-wide.
+Each platform and shared module has its own CLAUDE.md with local conventions;
+Claude loads them automatically as it moves into that directory.
+
+## Where things live
+
+- `ios/` — Swift, Xcode project, iOS-specific code
+- `android/` — Kotlin, Gradle, Android-specific code
+- `shared/` — (if applicable) cross-platform contracts, protobufs, etc.
+- `docs/` — engineering documentation
+
+See each subdirectory's CLAUDE.md for the rules of that area.
+
+## Critical gotchas (repo-wide)
+
+- **Network contracts are shared.** API request/response shapes live in `shared/`
+  (or whichever folder you use). A change there affects both platforms — run
+  both test suites, not just one.
+- **Versioning is per-platform.** iOS uses its own version scheme; Android uses
+  its own. Don't conflate them.
+- **Navigate by symbol, not by grep.** Both platforms have an LSP configured
+  (sourcekit-lsp for Swift, kotlin-language-server for Kotlin). Prefer
+  "go to definition" and "find references" over text search.
+- **Tests scoped to platform.** A change in `ios/` runs the iOS test target.
+  A change in `android/` runs the Android tests. A change in `shared/` runs both.
+
+## Commands
+
+```bash
+# iOS
+cd ios &amp;&amp; xcodebuild test -scheme <span class="tpl-repo">your-repo</span>
+
+# Android
+cd android &amp;&amp; ./gradlew test
+```
+</code></pre>
+
+  <div class="callout warn">
+    <div class="callout-title">Resist the urge to put everything in here</div>
+    <p>Conventions for the iOS code go in <code>ios/CLAUDE.md</code> (Phase 3). Conventions for the Android code go in <code>android/CLAUDE.md</code>. Skills go in skill files. If it doesn't apply repo-wide, it doesn't go in the root.</p>
+  </div>
+
+  <h2>Step 2 — Create .claudeignore</h2>
+  <p>This file tells Claude Code which paths to skip when searching or reading. It's the same idea as <code>.gitignore</code> — keep generated junk out of the agent's way.</p>
+
+  <h4>Template — .claudeignore</h4>
+  <pre><code class="language-bash"># Generated artifacts and build output
+build/
+DerivedData/
+.gradle/
+.idea/
+*.xcuserstate
+*.xcodeproj/xcuserdata/
+
+# Dependencies (let LSP/Xcode/Gradle manage these)
+Pods/
+node_modules/
+.bundle/
+
+# Caches
+.swiftpm/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Lockfiles — large, machine-generated
+Podfile.lock
+gradle.lockfile
+package-lock.json
+yarn.lock
+
+# Local environment + secrets
+.env
+.env.*
+*.pem
+*.p12
+*.keystore
+
+# Mac/Windows clutter
+.DS_Store
+Thumbs.db
+</code></pre>
+
+  <h2>Step 3 — Create .claude/settings.json</h2>
+  <p>This is where permissions and hooks live. For Phase 1, we'll set permissions only — hooks come in Phase 6.</p>
+
+  <h4>Template — .claude/settings.json</h4>
+  <pre><code class="language-json">{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild test:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(./gradlew build:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Read(./**/.env)",
+      "Read(./**/.env.*)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.p12)",
+      "Read(./**/*.keystore)"
+    ]
+  }
+}
+</code></pre>
+
+  <p>The <code>allow</code> list pre-approves commands you'd normally have to confirm one at a time. The <code>deny</code> list blocks things outright — never accidentally <code>rm -rf</code>, never read secrets files.</p>
+
+  <h2>Step 4 — Verify</h2>
+  <ol>
+    <li>Open a terminal in your repo root.</li>
+    <li>Run <code>claude</code>.</li>
+    <li>Ask: <em>"What's in your context right now? Just list the CLAUDE.md files you've loaded."</em></li>
+    <li>You should see the root <code>CLAUDE.md</code> listed.</li>
+  </ol>
+  <p>If the agent doesn't mention it, the file isn't being read — check the filename is exactly <code>CLAUDE.md</code> (case-sensitive) and that you're in the right directory.</p>
+
+  <h2>Checklist</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" id="p1-a"><label for="p1-a">Root <code>CLAUDE.md</code> created, lean, with pointers + gotchas</label></li>
+    <li><input type="checkbox" id="p1-b"><label for="p1-b"><code>.claudeignore</code> created with platform-specific exclusions</label></li>
+    <li><input type="checkbox" id="p1-c"><label for="p1-c"><code>.claude/settings.json</code> created with allow + deny lists</label></li>
+    <li><input type="checkbox" id="p1-d"><label for="p1-d">Verified <code>CLAUDE.md</code> is being loaded in a fresh session</label></li>
+    <li><input type="checkbox" id="p1-e"><label for="p1-e">All three files committed to git</label></li>
+  </ul>
+
+  <div class="pager"><a data-page="your-picture"><span class="pager-label">← Previous</span><span class="pager-title">03. Your codebase picture</span></a><a class="next" data-page="phase-2"><span class="pager-label">Next →</span><span class="pager-title">05. Phase 2 — Discovery</span></a></div>
+</section>
+
+<!-- ============ 05 PHASE 2 DISCOVERY ============ -->
+<section class="page" id="page-phase-2">
+  <span class="section-num">05</span>
+  <div class="eyebrow">Phase 2</div>
+  <h1>Discovery — let your agent find the right spots</h1>
+  <p class="lede">Don't guess where subdirectory CLAUDE.md files should go. Don't try to write them by hand. Have your agent audit your repo and tell you.</p>
+
+  <div class="phase-meta">
+    <span><strong>Time:</strong> ~30 min</span>
+    <span><strong>Prereq:</strong> Phase 1 complete</span>
+    <span><strong>Outcome:</strong> A prioritised list of where CLAUDE.md files belong</span>
+  </div>
+
+  <h2>Why this matters</h2>
+  <p>The right places for CLAUDE.md files aren't always obvious. Some folders are conventions-heavy; others are mostly boilerplate. Some have gotchas; others don't. Your agent — which has seen many codebases of similar shapes — can audit yours in minutes. Skipping this step usually results in either too many CLAUDE.mds (noise) or too few (the agent navigates blind in important areas).</p>
+
+  <h2>What you'll have at the end</h2>
+  <ul>
+    <li>A markdown table from your agent: <strong>path</strong>, <strong>why this area benefits from a CLAUDE.md</strong>, <strong>priority (1–3)</strong></li>
+    <li>A clear decision: which to do first, which to defer</li>
+  </ul>
+
+  <h2>Step 1 — Open your agent in your repo</h2>
+  <p>In a terminal, navigate to your repo root and start <span class="tpl-agent">Claude Code</span>.</p>
+
+  <h2>Step 2 — Paste this discovery prompt</h2>
+  <p>This is the most important prompt in the workbook. It tells your agent <em>not to write any files yet</em> — only to audit and recommend.</p>
+
+  <h4>Discovery prompt</h4>
+  <pre><code class="language-markdown">Audit this codebase and recommend where CLAUDE.md files should go.
+
+For each candidate directory:
+1. Briefly explain what makes this area distinct (its domain, language, or conventions)
+2. List the 2-3 gotchas an editor of this area absolutely needs to know
+3. Note the scoped test/build command for this area, if there is one
+4. Assign a priority: 1 (essential), 2 (valuable), 3 (nice to have)
+
+Use signals like: directory name and structure, the languages present,
+which folders import which other folders, the git log of recent changes,
+and any existing documentation. Look at file counts to gauge complexity.
+
+Output as a single markdown table with these columns:
+Path | Domain/language | Gotchas | Scoped test command | Priority
+
+Do NOT create any CLAUDE.md files. Just produce the table and a brief
+paragraph at the end explaining your reasoning for the ordering.
+</code></pre>
+
+  <h2>Step 3 — Read the output critically</h2>
+  <p>Your agent will produce a table. <strong>Don't accept it blindly.</strong> Read each row and ask yourself:</p>
+  <ul>
+    <li><strong>Is this area actually distinct?</strong> If two adjacent folders have identical conventions, they don't both need a CLAUDE.md.</li>
+    <li><strong>Are the listed gotchas real?</strong> Or did the agent invent plausible-sounding ones?</li>
+    <li><strong>Is the priority right for <em>your</em> day-to-day work?</strong> An area you edit twice a year is lower priority than one you touch weekly.</li>
+  </ul>
+  <p>Push back. Ask follow-ups like "Why priority 1 for <code>android/core</code> but priority 2 for <code>ios/Core</code>? Aren't they parallel?" Your agent will adjust.</p>
+
+  <h2>Step 4 — Pick your top 3–5 for Phase 3</h2>
+  <p>Don't try to draft eight CLAUDE.md files in one go. Pick the highest-priority three to five and do those first. You can always add more later. Save the priority-3 candidates for the next iteration.</p>
+
+  <div class="callout">
+    <div class="callout-title">Common output for a mobile app</div>
+    <p>For a typical iOS + Android app, the audit usually surfaces: <code>ios/</code> (Swift conventions), <code>android/</code> (Kotlin/Gradle conventions), <code>shared/</code> if you have one (network contracts), and possibly one networking module or one shared UI module per platform. Five files total is a good first pass.</p>
+  </div>
+
+  <h2>Step 5 — Save the audit for reference</h2>
+  <p>Copy the table from your agent's output into a file at <code>docs/ai-layer/audit-2026.md</code> (or wherever you keep engineering notes). You'll reference it in Phase 3 and again when you do your six-month review.</p>
+
+  <h2>Checklist</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" id="p2-a"><label for="p2-a">Ran the discovery prompt against my repo</label></li>
+    <li><input type="checkbox" id="p2-b"><label for="p2-b">Read the table critically and pushed back where it didn't match reality</label></li>
+    <li><input type="checkbox" id="p2-c"><label for="p2-c">Picked top 3–5 candidates for Phase 3</label></li>
+    <li><input type="checkbox" id="p2-d"><label for="p2-d">Saved the audit somewhere I can find it again</label></li>
+  </ul>
+
+  <div class="pager"><a data-page="phase-1"><span class="pager-label">← Previous</span><span class="pager-title">04. Phase 1 — Foundation</span></a><a class="next" data-page="phase-3"><span class="pager-label">Next →</span><span class="pager-title">06. Phase 3 — Sub-CLAUDE.mds</span></a></div>
+</section>
+
+<!-- ============ 06 PHASE 3 SUB CLAUDE.MDS ============ -->
+<section class="page" id="page-phase-3">
+  <span class="section-num">06</span>
+  <div class="eyebrow">Phase 3</div>
+  <h1>Subdirectory CLAUDE.md files</h1>
+  <p class="lede">Use your agent to draft the per-area handbooks. Your job is to review and tighten — not to write from scratch.</p>
+
+  <div class="phase-meta">
+    <span><strong>Time:</strong> ~1.5 hrs (for 3–5 files)</span>
+    <span><strong>Prereq:</strong> Phase 2 audit complete</span>
+    <span><strong>Outcome:</strong> 3–5 working CLAUDE.md files in the right places</span>
+  </div>
+
+  <h2>Why this matters</h2>
+  <p>Subdirectory CLAUDE.md files are loaded <em>additively</em> as the agent walks into each area. They're where the local rules live — conventions specific to the iOS code, gotchas specific to the Android build, the test command for one service. Without them, the root CLAUDE.md balloons trying to cover everything, and the agent ignores rules that don't visibly apply.</p>
+
+  <h2>What you'll have at the end</h2>
+  <p>Three to five CLAUDE.md files committed to your repo at the paths your Phase 2 audit identified. Each one short, focused, and unmistakably about <em>its</em> area.</p>
+
+  <h2>The rules every subdirectory CLAUDE.md must follow</h2>
+  <ol>
+    <li><strong>Under 60 lines.</strong> If it's longer, it's drifting into noise.</li>
+    <li><strong>Conventions, not tutorials.</strong> Don't explain what Swift is. Do explain how <em>your</em> Swift code handles error states.</li>
+    <li><strong>Gotchas first.</strong> The things that will bite an editor go above everything else.</li>
+    <li><strong>The scoped test/build command.</strong> Exactly what to run after editing this area.</li>
+    <li><strong>No duplication.</strong> If it's in the root CLAUDE.md, don't repeat it.</li>
+  </ol>
+
+  <h2>Step 1 — Draft each file using your agent</h2>
+  <p>For each path from your Phase 2 audit, run this prompt:</p>
+
+  <h4>Drafting prompt</h4>
+  <pre><code class="language-markdown">Draft a CLAUDE.md for the directory `[PATH FROM AUDIT]`.
+
+Follow these rules strictly:
+- Total length: under 60 lines
+- No facts that are obvious from the file extensions (don't say "this is
+  written in Swift")
+- No facts that already appear in the root CLAUDE.md
+- Lead with 3-5 gotchas an editor of this area must know
+- Include the exact scoped test/build command for this area
+- Use bullet points, not paragraphs
+- Reference other CLAUDE.md files where relevant rather than duplicating
+
+Read the actual code in that directory before drafting. Specifically look
+for: shared mutable state, error-handling patterns, naming conventions,
+import boundaries (what this area imports vs what imports it), and any
+unusual idioms.
+
+Output only the CLAUDE.md content — no preamble, no commentary.
+</code></pre>
+
+  <h2>Step 2 — Review every line</h2>
+  <p>Your agent will produce a draft. Read it line by line and ask:</p>
+  <ul>
+    <li><strong>Is this true?</strong> Agents occasionally hallucinate conventions. Check against the actual code.</li>
+    <li><strong>Is this useful?</strong> "This module uses Swift's standard library" is not useful. Cut it.</li>
+    <li><strong>Is this specific to this area?</strong> If it applies repo-wide, move it to the root.</li>
+  </ul>
+  <p>A good rule: <strong>delete a line if removing it wouldn't surprise a future editor.</strong></p>
+
+  <h2>Example — what a good ios/CLAUDE.md looks like</h2>
+  <pre><code class="language-markdown"># ios — Swift app target
+
+## Conventions
+
+- **Errors propagate via `Result&lt;T, AppError&gt;`** — never throw across module
+  boundaries. `AppError` enum lives in `Core/AppError.swift`.
+- **Networking goes through `APIClient`.** Direct `URLSession` calls are forbidden;
+  they bypass auth headers and analytics.
+- **No singletons except `APIClient` and `AnalyticsService`.** Everything else
+  uses dependency injection through the app's `Resolver`.
+- **State is async-let, not Combine.** We migrated off Combine in 2025;
+  any remaining `@Published` properties are tech debt.
+
+## Gotchas
+
+- **Xcode's "Clean Build Folder" doesn't clear DerivedData.** If a build is
+  acting strange, also `rm -rf ~/Library/Developer/Xcode/DerivedData/<span class="tpl-repo">your-repo</span>-*`.
+- **The simulator caches keychain data.** Logout flows need an explicit
+  `KeychainService.clear()` in tests, or the next test inherits the session.
+
+## Tests
+
+```bash
+cd ios &amp;&amp; xcodebuild test -scheme <span class="tpl-repo">your-repo</span> -destination 'platform=iOS Simulator,name=iPhone 15'
+```
+</code></pre>
+
+  <h2>Step 3 — Verify each file loads</h2>
+  <p>For each new CLAUDE.md, start a fresh session of your agent, ask it to read a file in that directory, and then ask: <em>"What CLAUDE.md files do you have loaded right now?"</em> Confirm the right ones appear.</p>
+
+  <h2>Step 4 — Commit</h2>
+  <p>Once each file is reviewed and verified, commit them as a single commit: <code>git commit -m "AI Layer: add subdirectory CLAUDE.md files"</code>. This is the foundation everything else builds on.</p>
+
+  <h2>Checklist</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" id="p3-a"><label for="p3-a">Drafted CLAUDE.md for each priority-1 area</label></li>
+    <li><input type="checkbox" id="p3-b"><label for="p3-b">Reviewed each draft line-by-line for accuracy and signal</label></li>
+    <li><input type="checkbox" id="p3-c"><label for="p3-c">Removed any duplicated content from the root CLAUDE.md</label></li>
+    <li><input type="checkbox" id="p3-d"><label for="p3-d">Verified each file loads in a fresh session</label></li>
+    <li><input type="checkbox" id="p3-e"><label for="p3-e">All files committed to git</label></li>
+  </ul>
+
+  <div class="pager"><a data-page="phase-2"><span class="pager-label">← Previous</span><span class="pager-title">05. Phase 2 — Discovery</span></a><a class="next" data-page="phase-4"><span class="pager-label">Next →</span><span class="pager-title">07. Phase 4 — LSP</span></a></div>
+</section>
+
+<!-- ============ 07 PHASE 4 LSP ============ -->
+<section class="page" id="page-phase-4">
+  <span class="section-num">07</span>
+  <div class="eyebrow">Phase 4</div>
+  <h1>LSP — symbol-level navigation</h1>
+  <p class="lede">The single highest-leverage upgrade for large codebases. Stop the agent from greppping its way around. Give it actual coordinates.</p>
+
+  <div class="phase-meta">
+    <span><strong>Time:</strong> ~1 hr per language</span>
+    <span><strong>Prereq:</strong> Phase 1 complete</span>
+    <span><strong>Outcome:</strong> Symbol-level search and navigation working</span>
+  </div>
+
+  <h2>Why this matters</h2>
+  <p>If you have a function named <code>fetch()</code> in your codebase, grep will find it. Grep will also find the word <code>fetch</code> in 47 comments, 12 string literals, 8 unrelated method names, and the word <code>prefetch</code> three times. The agent then opens each file to figure out which one matters. That's a lot of wasted context for an answer the LSP gives you instantly.</p>
+  <p>For native mobile development, this is especially valuable because Swift and Kotlin are strongly typed — the LSP has rich type information and can resolve symbols precisely.</p>
+
+  <h2>What you'll have at the end</h2>
+  <p>Two language servers running locally (one per platform), wired into Claude Code via a plugin. Your agent now has "go to definition" and "find all references" as native capabilities.</p>
+
+  <h2>iOS — Swift via sourcekit-lsp</h2>
+
+  <h4>Step 1: Confirm Xcode is installed</h4>
+  <p>sourcekit-lsp ships with Xcode. Run:</p>
+  <pre><code class="language-bash">xcrun --find sourcekit-lsp</code></pre>
+  <p>You should see a path like <code>/Applications/Xcode.app/Contents/Developer/usr/bin/sourcekit-lsp</code>. If you get an error, install Xcode from the App Store, then run <code>sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer</code>.</p>
+
+  <h4>Step 2: Install the Claude Code code-intelligence plugin</h4>
+  <p>In your terminal, in your repo root:</p>
+  <pre><code class="language-bash">claude
+/plugin install code-intelligence</code></pre>
+
+  <h4>Step 3: Configure it for Swift</h4>
+  <p>Ask your agent: <em>"Configure the code-intelligence plugin to use sourcekit-lsp for Swift files in <code>ios/</code>. Update <code>.claude/settings.json</code> if needed."</em></p>
+
+  <h4>Step 4: Verify</h4>
+  <p>Open a Swift file. Ask the agent: <em>"Find all references to <code>APIClient</code> in the iOS code."</em> If you see file:line references and the agent reports the count cleanly without opening 30 files first, the LSP is working.</p>
+
+  <h2>Android — Kotlin via kotlin-language-server</h2>
+
+  <h4>Step 1: Install kotlin-language-server</h4>
+  <p>On macOS via Homebrew:</p>
+  <pre><code class="language-bash">brew install kotlin-language-server</code></pre>
+  <p>On Linux or Windows, follow the <a href="https://github.com/fwcd/kotlin-language-server" target="_blank" rel="noopener">official install guide</a>.</p>
+
+  <h4>Step 2: Verify the binary</h4>
+  <pre><code class="language-bash">which kotlin-language-server</code></pre>
+  <p>You should see a path.</p>
+
+  <h4>Step 3: Wire into Claude Code</h4>
+  <p>Ask your agent: <em>"Configure the code-intelligence plugin to use kotlin-language-server for Kotlin files in <code>android/</code>. Update <code>.claude/settings.json</code> if needed."</em></p>
+
+  <h4>Step 4: Verify</h4>
+  <p>Open a Kotlin file. Ask the agent: <em>"Find all references to the <code>Repository</code> interface in the Android code."</em> Same test as iOS — clean file:line references, no scattered file-reading.</p>
+
+  <h2>What it feels like when LSP is working</h2>
+  <p>You'll notice:</p>
+  <ul>
+    <li>Refactor questions ("rename this function across the codebase") get answered in seconds, not minutes.</li>
+    <li>"Where is this defined?" gets one answer, not three guesses.</li>
+    <li>The agent's responses become more confident — because it's working from real type information, not pattern-matching.</li>
+  </ul>
+
+  <h2>Common stumbling blocks</h2>
+  <details><summary>"sourcekit-lsp can't find my Swift package / Xcode project"</summary>
+  <p>sourcekit-lsp needs to know the build context. Open the project in Xcode once first so it generates the DerivedData, then restart Claude Code. For Swift packages, ensure <code>Package.swift</code> is at the root of the indexed area.</p></details>
+  <details><summary>"kotlin-language-server is slow on first start"</summary>
+  <p>Expected. It builds an index of your Kotlin code on first use. Give it 5–10 minutes on a large codebase. Subsequent starts are fast.</p></details>
+  <details><summary>"It works for one platform but not the other"</summary>
+  <p>You probably configured the plugin for only one language. Run the configuration step for both.</p></details>
+
+  <h2>Checklist</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" id="p4-a"><label for="p4-a">sourcekit-lsp accessible via <code>xcrun</code></label></li>
+    <li><input type="checkbox" id="p4-b"><label for="p4-b">kotlin-language-server installed</label></li>
+    <li><input type="checkbox" id="p4-c"><label for="p4-c">code-intelligence plugin installed in Claude Code</label></li>
+    <li><input type="checkbox" id="p4-d"><label for="p4-d">Swift "find references" works cleanly</label></li>
+    <li><input type="checkbox" id="p4-e"><label for="p4-e">Kotlin "find references" works cleanly</label></li>
+  </ul>
+
+  <div class="pager"><a data-page="phase-3"><span class="pager-label">← Previous</span><span class="pager-title">06. Phase 3 — Sub-CLAUDE.mds</span></a><a class="next" data-page="phase-5"><span class="pager-label">Next →</span><span class="pager-title">08. Phase 5 — Skills</span></a></div>
+</section>
+
+<!-- ============ 08 PHASE 5 SKILLS ============ -->
+<section class="page" id="page-phase-5">
+  <span class="section-num">08</span>
+  <div class="eyebrow">Phase 5</div>
+  <h1>Skills — reusable expertise on demand</h1>
+  <p class="lede">Capture the things your team always has to re-explain. Skills load only when relevant, so your agent's "brain" stays uncluttered.</p>
+
+  <div class="phase-meta">
+    <span><strong>Time:</strong> ~30 min per skill</span>
+    <span><strong>Prereq:</strong> Phase 3 complete</span>
+    <span><strong>Outcome:</strong> 3–5 skills covering your most frequent workflows</span>
+  </div>
+
+  <h2>Why this matters</h2>
+  <p>Some pieces of expertise apply only sometimes. Money-handling rules apply only when working in billing. Test patterns apply only when writing tests. If you put all of it in CLAUDE.md, every session carries it — bloating the context for no reason. Skills sit dormant until they're needed.</p>
+
+  <h2>What you'll have at the end</h2>
+  <p>A <code>.claude/skills/</code> folder with three to five skills, each scoped via the <code>paths:</code> field so it auto-loads only in the relevant part of your codebase.</p>
+
+  <h2>The skills to build first</h2>
+  <p>For a native mobile app, the highest-leverage starting set:</p>
+  <div class="table-wrap"><table>
+    <tr><th>Skill</th><th>Scope</th><th>What it captures</th></tr>
+    <tr><td><code>scoped-tests</code></td><td>repo-wide</td><td>Which test command to run for each kind of change</td></tr>
+    <tr><td><code>ios-add-screen</code></td><td><code>ios/**</code></td><td>The exact steps to add a new screen in your iOS app</td></tr>
+    <tr><td><code>android-add-screen</code></td><td><code>android/**</code></td><td>Same, for Android</td></tr>
+    <tr><td><code>network-contract-change</code></td><td><code>shared/**</code> or wherever</td><td>Steps for changing an API contract — both platforms need updating</td></tr>
+  </table></div>
+
+  <h2>Anatomy of a skill</h2>
+  <p>A skill is a folder with a <code>SKILL.md</code> file. The first few lines (the "frontmatter") declare the skill's name, when to use it, and where it applies. The body is the actual content.</p>
+
+  <h4>Template — .claude/skills/scoped-tests/SKILL.md</h4>
+  <pre><code class="language-markdown">---
+name: scoped-tests
+description: &gt;-
+  Use after changing code, before claiming work is done — picks the
+  correctly scoped test command instead of running the full suite.
+paths:
+  - ios/**
+  - android/**
+  - shared/**
+---
+
+# Scoped test runner
+
+Running the whole suite on a one-platform change wastes time and context.
+Pick the narrowest command that still covers the change.
+
+| What you changed | Run |
+|------------------|-----|
+| `ios/**` | `cd ios &amp;&amp; xcodebuild test -scheme <span class="tpl-repo">your-repo</span>` |
+| `android/**` | `cd android &amp;&amp; ./gradlew test` |
+| `shared/**` | Both — `shared` is consumed by both platforms |
+
+**Rule:** if `shared/` changed, always run both test suites. A breaking
+change there ships to production if either platform isn't checked.
+</code></pre>
+
+  <h4>Template — .claude/skills/ios-add-screen/SKILL.md</h4>
+  <pre><code class="language-markdown">---
+name: ios-add-screen
+description: &gt;-
+  Use when adding a new screen to the iOS app. Walks the exact steps so
+  the new screen follows <span class="tpl-repo">your-repo</span>'s navigation, state, and analytics conventions.
+paths: ios/**
+---
+
+# Adding an iOS screen
+
+Activates when working in `ios/`. Follow these steps in order.
+
+1. **Create the View** in `Features/&lt;FeatureName&gt;/` as a SwiftUI `View`.
+   Use the project's `ViewModel` protocol — no logic inside the view.
+2. **Create the ViewModel** in the same folder. Inherit from
+   `BaseViewModel&lt;State, Action&gt;`. State is an enum, actions are an enum.
+3. **Register the route** in `Navigation/AppRoutes.swift`. A screen not
+   registered there cannot be navigated to.
+4. **Add the analytics event** in `Analytics/Events.swift`.
+   Convention: `screen_viewed_&lt;feature_name&gt;`.
+5. **Add a snapshot test** in `FeatureName/Tests/&lt;FeatureName&gt;SnapshotTests.swift`.
+
+Full checklist with code patterns: [references/screen-checklist.md](references/screen-checklist.md).
+</code></pre>
+
+  <h2>The "paths:" field — pay attention to this</h2>
+  <p>The <code>paths:</code> field is what makes skills lightweight. A skill scoped to <code>ios/**</code> doesn't even register in the agent's awareness when you're working in Android. This is how you can have a dozen skills and only the relevant 1–2 load at any time.</p>
+  <ul>
+    <li><code>ios/**</code> — anywhere under <code>ios/</code> at any depth</li>
+    <li><code>ios/Features/**</code> — only under the Features folder</li>
+    <li>Multiple paths via a YAML list (see <code>scoped-tests</code> example above)</li>
+  </ul>
+
+  <h2>Progressive disclosure — keep skills lean</h2>
+  <p>Your skill's <code>SKILL.md</code> should be short — under 50 lines. For longer guidance (full code patterns, edge cases), create a <code>references/</code> folder beside it and link to specific files. The agent loads the reference only when it needs the detail.</p>
+
+  <h2>Step 1 — Use your agent to draft each skill</h2>
+  <p>For each skill in your starting set, run this prompt:</p>
+
+  <h4>Skill-drafting prompt</h4>
+  <pre><code class="language-markdown">Draft a skill at `.claude/skills/[NAME]/SKILL.md` for the following task:
+
+  [DESCRIBE THE TASK — e.g. "Adding a new screen to our iOS app"]
+
+Follow these rules:
+- Use the YAML frontmatter format (name, description, paths)
+- The description must clearly state when to use this skill
+- The paths: field should restrict it to the relevant directories
+- Keep SKILL.md under 50 lines
+- Use numbered steps for procedures, tables for reference data
+- For any deep detail, create a stub at references/[name].md and link to it
+
+Read [example file or area] before drafting so the skill reflects how the
+actual code is structured.
+
+Output the SKILL.md content only.
+</code></pre>
+
+  <h2>Step 2 — Test that the skill loads</h2>
+  <p>After creating a skill, start a fresh session, open a file in the skill's scope, and ask: <em>"What skills do you have loaded right now?"</em> The skill should appear. Then ask it a question the skill addresses; you should see the skill's guidance reflected in the answer.</p>
+
+  <h2>Step 3 — Verify scoping works</h2>
+  <p>Switch to a file <em>outside</em> the skill's scope and ask the same question. The skill should not be loaded; the answer should be more generic. If it loads anyway, your <code>paths:</code> field is too broad.</p>
+
+  <h2>Checklist</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" id="p5-a"><label for="p5-a">Created <code>scoped-tests</code> skill</label></li>
+    <li><input type="checkbox" id="p5-b"><label for="p5-b">Created <code>ios-add-screen</code> (or equivalent for your iOS workflow)</label></li>
+    <li><input type="checkbox" id="p5-c"><label for="p5-c">Created <code>android-add-screen</code> (or equivalent for your Android workflow)</label></li>
+    <li><input type="checkbox" id="p5-d"><label for="p5-d">Created one more skill specific to your codebase</label></li>
+    <li><input type="checkbox" id="p5-e"><label for="p5-e">Verified each skill loads only in its scope</label></li>
+  </ul>
+
+  <div class="pager"><a data-page="phase-4"><span class="pager-label">← Previous</span><span class="pager-title">07. Phase 4 — LSP</span></a><a class="next" data-page="phase-6"><span class="pager-label">Next →</span><span class="pager-title">09. Phase 6 — Hooks</span></a></div>
+</section>
+
+<!-- ============ 09 PHASE 6 HOOKS ============ -->
+<section class="page" id="page-phase-6">
+  <span class="section-num">09</span>
+  <div class="eyebrow">Phase 6</div>
+  <h1>Hooks — automation that runs itself</h1>
+  <p class="lede">Two hooks. The first gives every session instant orientation. The second makes your AI Layer improve itself.</p>
+
+  <div class="phase-meta">
+    <span><strong>Time:</strong> ~2 hrs</span>
+    <span><strong>Prereq:</strong> Phase 5 complete</span>
+    <span><strong>Outcome:</strong> SessionStart + Stop hooks running, self-improvement loop active</span>
+  </div>
+
+  <h2>Why this matters</h2>
+  <p>You can write the best CLAUDE.md files in the world, but they drift. Code evolves; the documentation about it lags. Hooks are how you fight drift automatically. The SessionStart hook ensures every session starts oriented to <em>now</em> (not last week). The Stop hook reflects on what just happened and proposes documentation updates while context is fresh.</p>
+
+  <h2>What you'll have at the end</h2>
+  <ul>
+    <li>A <code>SessionStart</code> hook that injects today's "active areas" and recent commits at every session start</li>
+    <li>A <code>Stop</code> hook that detects changed areas and spawns a background reflection that proposes CLAUDE.md edits</li>
+    <li>A new file <code>.claude/claude-md-review.md</code> that accumulates proposed updates for you to review</li>
+  </ul>
+
+  <h2>Start simple — SessionStart only</h2>
+  <p>Don't try to build both hooks at once. Get SessionStart working first; it's the simpler one and gives you immediate value.</p>
+
+  <h4>Template — .claude/hooks/session_start_context.py</h4>
+  <pre><code class="language-python">"""SessionStart hook — dynamic per-area orientation.
+
+Prints a short orientation block at the start of every Claude Code session.
+Claude Code injects this stdout into the session context, so Claude starts
+already knowing which area has active work — and the recent direction of
+travel from git history — without spending a turn re-exploring.
+
+Tested standalone: `python .claude/hooks/session_start_context.py`
+"""
+from __future__ import annotations
+
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+_EXCLUDE_DIRS = frozenset({
+    ".git", ".venv", "venv", "env", "node_modules", "__pycache__",
+    ".pytest_cache", ".gradle", "build", "DerivedData", "Pods",
+})
+
+
+def _project_root() -&gt; Path:
+    project = os.environ.get("CLAUDE_PROJECT_DIR")
+    return Path(project) if project else Path(__file__).resolve().parents[2]
+
+
+def _claude_md_areas(root: Path) -&gt; set[str]:
+    areas: set[str] = set()
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in _EXCLUDE_DIRS]
+        if "CLAUDE.md" in filenames:
+            rel = Path(dirpath).relative_to(root).as_posix()
+            if rel != ".":
+                areas.add(rel)
+    return areas
+
+
+def _area_of(changed: str, areas: set[str]) -&gt; str | None:
+    parts = changed.split("/")
+    for depth in range(len(parts) - 1, 0, -1):
+        candidate = "/".join(parts[:depth])
+        if candidate in areas:
+            return candidate
+    return None
+
+
+def _working_tree_changes(root: Path) -&gt; list[str]:
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=root, capture_output=True, text=True, timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return []
+    return [line[3:].strip().replace("\\", "/")
+            for line in result.stdout.splitlines() if len(line) &gt; 3]
+
+
+def _recent_commits(root: Path, limit: int = 5) -&gt; list[str]:
+    try:
+        result = subprocess.run(
+            ["git", "log", f"-{limit}", "--pretty=format:%h %s"],
+            cwd=root, capture_output=True, text=True, timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return []
+    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+
+def main() -&gt; None:
+    try: sys.stdin.read()
+    except: pass
+
+    root = _project_root()
+    governed = _claude_md_areas(root)
+    changes = _working_tree_changes(root)
+    active = sorted({_area_of(p, governed) for p in changes if _area_of(p, governed)})
+
+    lines = ["## Session orientation", ""]
+    if active:
+        lines.append(f"Active area(s) this session: **{', '.join(active)}**.")
+        lines.append("Load the matching CLAUDE.md in each before editing.")
+    else:
+        lines.append("Working tree is clean — no area has pending work.")
+
+    commits = _recent_commits(root)
+    if commits:
+        lines.append("")
+        lines.append("Recent commits (newest first):")
+        lines.extend(f"- {commit}" for commit in commits)
+
+    print("\n".join(lines))
+
+
+if __name__ == "__main__":
+    main()
+</code></pre>
+
+  <h4>Wire it into .claude/settings.json</h4>
+  <p>Add the <code>hooks</code> block to your existing settings.json:</p>
+  <pre><code class="language-json">{
+  "permissions": { "...": "your existing allow/deny lists" },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_start_context.py\""
+          }
+        ]
+      }
+    ]
+  }
+}
+</code></pre>
+
+  <h4>Verify SessionStart</h4>
+  <p>Quit any open Claude Code session. Run <code>claude</code> in your repo. You should see the orientation block ("Active area(s) this session…") in the first response. If you don't, check:</p>
+  <ul>
+    <li>The script runs standalone: <code>python .claude/hooks/session_start_context.py</code> from your repo root</li>
+    <li>The path in settings.json is correct</li>
+    <li>Python is on your PATH</li>
+  </ul>
+
+  <h2>Then add the self-improving Stop hook</h2>
+  <p>This is the more sophisticated piece. It's split into two scripts because the work is split: a cheap trigger that runs every turn, and an expensive reflection that runs in the background only when something actually changed.</p>
+
+  <details><summary>Show the full Stop hook script (propose_claude_md.py)</summary>
+  <p>This file lives at <code>.claude/hooks/propose_claude_md.py</code>. It's adapted from <a href="https://github.com/coleam00/helpline" target="_blank" rel="noopener">Cole's helpline repo</a>.</p>
+  <pre><code class="language-python">"""Stop hook trigger — cheap, deterministic part of the self-improving loop.
+
+Detects which CLAUDE.md-governed areas changed, dedups against prior runs,
+and spawns reflect_claude_md.py in the background. Returns immediately so
+the turn never blocks on an LLM call.
+
+Three guards: recursion lock, diff fingerprint dedup, deterministic fallback
+if the reflector fails.
+"""
+from __future__ import annotations
+
+import hashlib, os, subprocess, sys
+from pathlib import Path
+
+_EXCLUDE_DIRS = frozenset({
+    ".git", ".venv", "venv", "env", "node_modules", "__pycache__",
+    ".pytest_cache", ".gradle", "build", "DerivedData", "Pods",
+})
+_LOCK_ENV = "AILAYER_REFLECT_LOCK"
+_STATE_FILE = ".claude/.claude-md-review-state"
+_REFLECTOR = "reflect_claude_md.py"
+_DETACHED_PROCESS = 0x00000008
+
+
+def _project_root() -&gt; Path:
+    project = os.environ.get("CLAUDE_PROJECT_DIR")
+    return Path(project) if project else Path(__file__).resolve().parents[2]
+
+
+def _git(args, root, timeout=5):
+    try:
+        return subprocess.run(["git", *args], cwd=root, capture_output=True,
+                              text=True, timeout=timeout).stdout
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+def _claude_md_areas(root):
+    areas = set()
+    for dp, dns, fns in os.walk(root):
+        dns[:] = [d for d in dns if d not in _EXCLUDE_DIRS]
+        if "CLAUDE.md" in fns:
+            rel = Path(dp).relative_to(root).as_posix()
+            if rel != ".": areas.add(rel)
+    return areas
+
+
+def _area_of(changed, areas):
+    parts = changed.split("/")
+    for depth in range(len(parts) - 1, 0, -1):
+        c = "/".join(parts[:depth])
+        if c in areas: return c
+    return None
+
+
+def _touched_areas(root):
+    governed = _claude_md_areas(root)
+    out = set()
+    for line in _git(["status", "--porcelain"], root).splitlines():
+        if len(line) &lt;= 3: continue
+        path = line[3:].strip().replace("\\", "/")
+        a = _area_of(path, governed)
+        if a: out.add(a)
+    return out
+
+
+def _spawn_reflector(reflector, root):
+    flags = 0; new_session = False
+    if os.name == "nt":
+        flags = subprocess.CREATE_NEW_PROCESS_GROUP | _DETACHED_PROCESS
+    else:
+        new_session = True
+    try:
+        subprocess.Popen(
+            [sys.executable, str(reflector)],
+            cwd=str(root),
+            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            creationflags=flags, start_new_session=new_session,
+        )
+    except Exception:
+        return False
+    return True
+
+
+def main():
+    try: sys.stdin.read()
+    except: pass
+    if os.environ.get(_LOCK_ENV): return 0
+
+    root = _project_root()
+    areas = _touched_areas(root)
+    if not areas: return 0
+
+    fp = hashlib.sha256(_git(["diff", "HEAD", "--", *sorted(areas)], root)
+                        .encode("utf-8", "replace")).hexdigest()
+    state = root / _STATE_FILE
+    try:
+        if state.read_text().strip() == fp: return 0
+    except OSError: pass
+
+    reflector = Path(__file__).with_name(_REFLECTOR)
+    if not reflector.is_file(): return 0
+    if not _spawn_reflector(reflector, root): return 0
+
+    try:
+        state.parent.mkdir(parents=True, exist_ok=True)
+        state.write_text(fp)
+    except OSError: pass
+
+    print(f"[ai-layer] {len(areas)} area(s) changed — reflecting in background", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+</code></pre>
+  </details>
+
+  <details><summary>Show the reflector script (reflect_claude_md.py)</summary>
+  <p>This file lives at <code>.claude/hooks/reflect_claude_md.py</code>. It calls headless <code>claude -p</code> to do the actual reflection.</p>
+  <pre><code class="language-python">"""The reasoning half of the self-improving Stop hook.
+
+Gathers the session's working-tree diff plus the current CLAUDE.md of every
+area that changed, asks Claude (headless `claude -p`) to judge whether those
+conventions still hold, and writes the proposal to .claude/claude-md-review.md.
+
+If `claude` is unavailable, writes a deterministic "re-check these files"
+note instead.
+"""
+from __future__ import annotations
+
+import os, shutil, subprocess, sys
+from datetime import datetime
+from pathlib import Path
+
+_REVIEW = ".claude/claude-md-review.md"
+_LOCK = "AILAYER_REFLECT_LOCK"
+_MAX_DIFF = 12_000
+_TIMEOUT = 180
+
+
+def _root():
+    p = os.environ.get("CLAUDE_PROJECT_DIR")
+    return Path(p) if p else Path(__file__).resolve().parents[2]
+
+
+def _git(args, root):
+    try:
+        return subprocess.run(["git", *args], cwd=root, capture_output=True,
+                              text=True, timeout=10).stdout
+    except: return ""
+
+
+def _touched(root):
+    EXCLUDE = {".git", ".venv", "node_modules", "__pycache__", ".gradle",
+               "build", "DerivedData", "Pods"}
+    areas = set()
+    for dp, dns, fns in os.walk(root):
+        dns[:] = [d for d in dns if d not in EXCLUDE]
+        if "CLAUDE.md" in fns:
+            rel = Path(dp).relative_to(root).as_posix()
+            if rel != ".": areas.add(rel)
+    touched = {}
+    for line in _git(["status", "--porcelain"], root).splitlines():
+        if len(line) &lt;= 3: continue
+        path = line[3:].strip().replace("\\", "/")
+        for depth in range(len(path.split("/")) - 1, 0, -1):
+            c = "/".join(path.split("/")[:depth])
+            if c in areas:
+                touched[c] = touched.get(c, 0) + 1
+                break
+    return touched
+
+
+def _build_prompt(root, areas, diff):
+    blocks = []
+    for area in sorted(areas):
+        md = root / area / "CLAUDE.md"
+        content = md.read_text() if md.is_file() else "(no CLAUDE.md yet)"
+        blocks.append(f"### {area}/CLAUDE.md\n\n{content}")
+    return f"""You are auditing whether a codebase's CLAUDE.md files still match \
+reality after a coding session.
+
+Below is the git diff of uncommitted changes, then each touched area's CLAUDE.md.
+
+For EACH area, output one of:
+- `No change needed` — the CLAUDE.md still holds
+- A concrete proposed edit: the specific line(s) to add, change, or remove,
+  plus one sentence on why
+
+Only propose updates for genuine new conventions, gotchas, or constraints.
+Skip stylistic rewrites. Be terse. No tools needed.
+
+## Git diff
+```
+{diff}
+```
+
+## Current CLAUDE.md files
+{chr(10).join(blocks)}
+"""
+
+
+def _run_claude(prompt, root):
+    claude = shutil.which("claude")
+    if not claude: return None
+    env = dict(os.environ); env[_LOCK] = "1"
+    try:
+        r = subprocess.run(
+            [claude, "-p", "--output-format", "text"],
+            cwd=root, input=prompt, capture_output=True, text=True,
+            timeout=_TIMEOUT, env=env,
+        )
+    except: return None
+    return r.stdout.strip() if r.returncode == 0 else None
+
+
+def _fallback(areas, stamp):
+    lines = [f"# CLAUDE.md review — {stamp}", "",
+             "_`claude` CLI unavailable. Re-check these areas by hand._", ""]
+    for area, n in sorted(areas.items()):
+        lines.append(f"- **{area}** ({n} file(s))")
+    return "\n".join(lines) + "\n"
+
+
+def reflect():
+    if os.environ.get(_LOCK): return 0
+    root = _root()
+    areas = _touched(root)
+    if not areas: return 0
+    diff = _git(["diff", "HEAD", "--", *sorted(areas)], root)
+    if len(diff) &gt; _MAX_DIFF:
+        diff = diff[:_MAX_DIFF] + "\n... (truncated)"
+    stamp = datetime.now().isoformat(timespec="seconds")
+    out = _run_claude(_build_prompt(root, areas, diff), root) if diff.strip() else None
+    body = (f"# CLAUDE.md review — {stamp}\n\n{out}\n"
+            if out else _fallback(areas, stamp))
+    review = root / _REVIEW
+    try:
+        review.parent.mkdir(parents=True, exist_ok=True)
+        review.write_text(body)
+    except: return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(reflect())
+</code></pre>
+  </details>
+
+  <h4>Wire the Stop hook into settings.json</h4>
+  <pre><code class="language-json">{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_start_context.py\"" }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/propose_claude_md.py\"" }] }
+    ]
+  }
+}
+</code></pre>
+
+  <h2>Verify the Stop hook</h2>
+  <ol>
+    <li>Start a fresh Claude Code session.</li>
+    <li>Edit one file in a CLAUDE.md-governed area (e.g. <code>ios/SomeView.swift</code>).</li>
+    <li>End your turn (let the agent respond).</li>
+    <li>Wait 30 seconds. Check for the file <code>.claude/claude-md-review.md</code> — it should exist with a proposed edit or "no change needed."</li>
+  </ol>
+
+  <h2>How to use the review file</h2>
+  <p>Once a week (or whenever it feels right), open <code>.claude/claude-md-review.md</code>, read the proposed edits, and apply the ones that make sense. Most won't — but the ones that do prevent your CLAUDE.md files from rotting silently.</p>
+
+  <h2>Checklist</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" id="p6-a"><label for="p6-a">SessionStart hook installed and verified</label></li>
+    <li><input type="checkbox" id="p6-b"><label for="p6-b">Stop hook trigger installed</label></li>
+    <li><input type="checkbox" id="p6-c"><label for="p6-c">Reflector installed</label></li>
+    <li><input type="checkbox" id="p6-d"><label for="p6-d">Both wired into settings.json</label></li>
+    <li><input type="checkbox" id="p6-e"><label for="p6-e">Verified <code>.claude/claude-md-review.md</code> gets written after a session with edits</label></li>
+  </ul>
+
+  <div class="pager"><a data-page="phase-5"><span class="pager-label">← Previous</span><span class="pager-title">08. Phase 5 — Skills</span></a><a class="next" data-page="phase-7"><span class="pager-label">Next →</span><span class="pager-title">10. Phase 7 — Subagent</span></a></div>
+</section>
+
+<!-- ============ 10 PHASE 7 SUBAGENT ============ -->
+<section class="page" id="page-phase-7">
+  <span class="section-num">10</span>
+  <div class="eyebrow">Phase 7</div>
+  <h1>Subagent — the read-only scout</h1>
+  <p class="lede">Send a scout ahead. Map the territory cheaply. Then act with the full picture.</p>
+
+  <div class="phase-meta">
+    <span><strong>Time:</strong> ~20 min</span>
+    <span><strong>Prereq:</strong> Phase 3 complete</span>
+    <span><strong>Outcome:</strong> A reusable explorer subagent</span>
+  </div>
+
+  <h2>Why this matters</h2>
+  <p>When your main agent enters an unfamiliar subsystem, it spends a lot of attention on discovery before any actual editing. By the time it understands the area, half its context budget is gone. A subagent solves this: it explores with <em>its own</em> context, returns only a summary, and the main agent edits with that summary in hand — fresh context, full picture.</p>
+  <p>The trick is that the subagent must be <strong>read-only</strong>. If it can edit, it might start trying to "fix" things while exploring, defeating the purpose. We enforce read-only by not giving it write tools — not by asking nicely.</p>
+
+  <h2>What you'll have at the end</h2>
+  <p>A single file at <code>.claude/agents/explorer.md</code> that defines a reusable scout. Any time you need to map a subsystem before editing it, you dispatch the explorer.</p>
+
+  <h2>Step 1 — Create the explorer</h2>
+  <p>The explorer is defined in one markdown file. Frontmatter sets its name, scope, and — critically — which tools it's allowed to use.</p>
+
+  <h4>Template — .claude/agents/explorer.md</h4>
+  <pre><code class="language-markdown">---
+name: explorer
+description: &gt;-
+  Read-only subsystem explorer. Use it to map an unfamiliar service or
+  module BEFORE editing — it explores with its own context window and
+  reports back, so the main agent edits with the full picture instead
+  of burning its context on discovery.
+tools: Read, Grep, Glob
+model: sonnet
+---
+
+# Explorer subagent
+
+You map one subsystem of the <span class="tpl-repo">your-repo</span> codebase. You are **genuinely
+read-only**: your only tools are `Read`, `Grep`, and `Glob`. There is no
+`Write` or `Edit`, so you *cannot* modify the codebase even if asked.
+
+## When you are invoked
+
+You will be given one subsystem to map — a top-level folder like `ios/`,
+`android/`, or a submodule like `ios/Features/Billing`.
+
+## What to do
+
+1. Read that subsystem's `CLAUDE.md` first if it has one.
+2. Use Glob and Grep to find: entry points, public types/classes, what it
+   imports from other modules, and what imports it.
+3. Identify the gotchas — shared state, error contracts, anything surprising.
+4. Return your findings as your final report, under these headings:
+   - **Entry points** — where work starts
+   - **Key types &amp; functions** — the public surface
+   - **Dependencies** — what it imports, what imports it
+   - **Gotchas** — what would bite an editor
+   - **Suggested fixes** — anything that looks wrong; *describe* it,
+     since you cannot apply it
+
+## Why read-only
+
+Running exploration and editing in one session spends the editing context
+on discovery. A separate read-only explorer keeps them apart. Having no
+write tools is the *guarantee* of that separation, not a polite request
+you could break.
+</code></pre>
+
+  <h2>Step 2 — Dispatch it</h2>
+  <p>In a Claude Code session, ask: <em>"Use the explorer subagent to map <code>android/core</code> and report back."</em></p>
+  <p>The explorer will run in a separate context window, do its work, and return a report. Your main agent receives the report — not the explorer's reading list — and can then edit with a complete picture.</p>
+
+  <h2>When to use the explorer</h2>
+  <ul>
+    <li>You're about to refactor code you haven't touched in months.</li>
+    <li>You're picking up a service or module a teammate built.</li>
+    <li>You're debugging an issue that crosses several modules.</li>
+    <li>You're estimating the scope of a feature that touches an unfamiliar area.</li>
+  </ul>
+  <p>When <em>not</em> to use it: a quick edit to a file you know well. The dispatch overhead isn't worth it for small, scoped changes.</p>
+
+  <h2>Checklist</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" id="p7-a"><label for="p7-a">Created <code>.claude/agents/explorer.md</code></label></li>
+    <li><input type="checkbox" id="p7-b"><label for="p7-b">Verified tools field includes only Read/Grep/Glob (no Write/Edit)</label></li>
+    <li><input type="checkbox" id="p7-c"><label for="p7-c">Dispatched it once and got a usable report</label></li>
+  </ul>
+
+  <div class="pager"><a data-page="phase-6"><span class="pager-label">← Previous</span><span class="pager-title">09. Phase 6 — Hooks</span></a><a class="next" data-page="phase-8"><span class="pager-label">Next →</span><span class="pager-title">11. Phase 8 — MCP</span></a></div>
+</section>
+
+<!-- ============ 11 PHASE 8 MCP ============ -->
+<section class="page" id="page-phase-8">
+  <span class="section-num">11</span>
+  <div class="eyebrow">Phase 8 · Advanced</div>
+  <h1>MCP — structured tools for your agent</h1>
+  <p class="lede">For when grep noise becomes a real problem, or you want to plug your agent into something only your team has.</p>
+
+  <div class="phase-meta">
+    <span><strong>Time:</strong> half a day or more</span>
+    <span><strong>Prereq:</strong> Phases 1–7 done and bedded in</span>
+    <span><strong>Outcome:</strong> Optional. Skip unless you need it.</span>
+  </div>
+
+  <h2>Why this matters — and when it doesn't</h2>
+  <p>An MCP server is a custom tool your agent can call. The most common uses for a custom MCP:</p>
+  <ul>
+    <li><strong>Codebase search</strong> by AST instead of grep. Useful for million-line codebases or codebases where method names are common words.</li>
+    <li><strong>Internal documentation lookup</strong> across systems your team uses (Notion, internal wikis, design docs).</li>
+    <li><strong>Ticket/issue queries</strong> against Jira, Linear, Shortcut, etc.</li>
+    <li><strong>Deployment or analytics queries</strong> for your specific platforms.</li>
+  </ul>
+  <p><strong>You probably don't need this in your first month.</strong> The patterns from Phases 1–7 deliver most of the value. MCP servers are a high-investment, high-ceiling addition you make when you've outgrown the basics.</p>
+
+  <h2>What an MCP server is, in one paragraph</h2>
+  <p>An MCP server is a small program (Python, Node, anything) that exposes a set of "tools" — functions the agent can call. It runs locally and communicates over standard input/output. You wire it into Claude Code via a file called <code>.mcp.json</code>. From the agent's point of view, calling your MCP server's tool feels the same as calling any built-in tool.</p>
+
+  <h2>The high-value first MCP — AST-based codebase search</h2>
+  <p>The single most useful custom MCP for a large mobile codebase is a structured search server. Instead of grep returning 200 matches for "send," your AST-based search returns "the 3 actual <em>function definitions</em> named <code>send</code> in your repo, with their qualified names and line numbers."</p>
+  <p>Cole's helpline repo includes <a href="https://github.com/coleam00/helpline/blob/main/tooling/mcp/codebase_search.py" target="_blank" rel="noopener">a reference implementation in Python</a>. For Swift and Kotlin you'd write something similar using each language's AST tooling (SwiftSyntax and Kotlin's PSI, respectively) — or use the LSP from Phase 4, which already provides much of this.</p>
+
+  <h2>When the LSP is enough vs when you need MCP</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Situation</th><th>LSP enough?</th><th>MCP useful?</th></tr>
+    <tr><td>"Where is <code>Foo</code> defined?"</td><td>Yes</td><td>No</td></tr>
+    <tr><td>"Find all callers of <code>Foo</code>"</td><td>Yes</td><td>No</td></tr>
+    <tr><td>"List every API endpoint our app calls"</td><td>No — that's a custom query</td><td>Yes</td></tr>
+    <tr><td>"Show me every screen using <code>OldDeprecatedView</code>"</td><td>Yes</td><td>No</td></tr>
+    <tr><td>"Query our internal ticketing system"</td><td>No</td><td>Yes</td></tr>
+    <tr><td>"What changed across services in the last release?"</td><td>No</td><td>Yes</td></tr>
+  </table></div>
+
+  <h2>Step 0 — Decide if you need this</h2>
+  <p>Before investing days into a custom MCP, ask: <em>"After three months with Phases 1–7, what queries am I still hand-running because my agent can't?"</em> Those are your candidate MCP tools. If the answer is "none," skip this phase.</p>
+
+  <h2>Step 1 — If you decide yes, start with one well-defined tool</h2>
+  <p>Don't try to build a Swiss army knife MCP. Pick one query that you run by hand more than weekly. Build an MCP server with that one tool. Live with it for a sprint. Add more tools only when you've felt the pull.</p>
+
+  <h2>What's in this phase, deliberately</h2>
+  <p>This workbook deliberately doesn't include a full MCP server template — because the right design depends entirely on what you're querying. The prompt below gets your agent to scaffold one for you.</p>
+
+  <h4>MCP scaffolding prompt</h4>
+  <pre><code class="language-markdown">I want to build a custom MCP server for my repo. The tool it should expose:
+
+  [DESCRIBE — e.g. "Given a feature name, return every Swift file
+   that references it and every Kotlin file that references it,
+   so I can audit cross-platform consistency."]
+
+Scaffold:
+1. The Python (or Node) script for the MCP server
+2. The .mcp.json entry to wire it in
+3. A README explaining how to run and test it standalone
+
+Use the MCP SDK conventions (the `mcp` Python package or `@modelcontextprotocol/sdk`
+for Node). The tool's docstring must be precise — the agent decides when to call it
+based on that description.
+
+Output: the files, with the path each should live at.
+</code></pre>
+
+  <h2>Checklist</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" id="p8-a"><label for="p8-a">Identified at least one query I'd want an MCP for (or decided: not yet)</label></li>
+    <li><input type="checkbox" id="p8-b"><label for="p8-b">If proceeding: scaffolded an MCP server with one tool</label></li>
+    <li><input type="checkbox" id="p8-c"><label for="p8-c">Wired it into <code>.mcp.json</code></label></li>
+    <li><input type="checkbox" id="p8-d"><label for="p8-d">Verified the agent calls it correctly</label></li>
+  </ul>
+
+  <div class="pager"><a data-page="phase-7"><span class="pager-label">← Previous</span><span class="pager-title">10. Phase 7 — Subagent</span></a><a class="next" data-page="phase-9"><span class="pager-label">Next →</span><span class="pager-title">12. Phase 9 — Plugin</span></a></div>
+</section>
+
+<!-- ============ 12 PHASE 9 PLUGIN ============ -->
+<section class="page" id="page-phase-9">
+  <span class="section-num">12</span>
+  <div class="eyebrow">Phase 9</div>
+  <h1>Plugin — distribute what works</h1>
+  <p class="lede">Once your AI Layer earns its keep, bundle the portable pieces so teammates (or a future project) get them in one command.</p>
+
+  <div class="phase-meta">
+    <span><strong>Time:</strong> ~2 hrs</span>
+    <span><strong>Prereq:</strong> Phases 1–7 working</span>
+    <span><strong>Outcome:</strong> An installable plugin teammates can adopt with <code>/plugin install</code></span>
+  </div>
+
+  <h2>Why this matters</h2>
+  <p>Without a plugin, knowledge stays tribal. The first engineer to set up their AI Layer reaps the reward; everyone else either copies files by hand or stays without. A plugin turns your setup into a one-command install for anyone on your team — or in your community.</p>
+
+  <h2>What travels vs what stays</h2>
+  <p>This is the crucial distinction. Some of your AI Layer is repo-specific (the CLAUDE.md files describing <em>your</em> conventions). Some of it is portable (the hooks that detect changed areas based on CLAUDE.md presence — they work in any repo). The plugin bundles only the portable pieces.</p>
+
+  <div class="table-wrap"><table>
+    <tr><th>Stays in your repo</th><th>Goes in the plugin</th></tr>
+    <tr><td>Root <code>CLAUDE.md</code></td><td>The Stop hook (works in any repo with a CLAUDE.md hierarchy)</td></tr>
+    <tr><td>Subdirectory <code>CLAUDE.md</code> files</td><td>The reflector script</td></tr>
+    <tr><td>Domain-specific skills (<code>ios-add-screen</code>, etc.)</td><td>Generic skills (<code>scoped-tests</code>)</td></tr>
+    <tr><td>SessionStart hook (references your structure)</td><td>The explorer subagent</td></tr>
+    <tr><td><code>.claudeignore</code> (your file patterns)</td><td>Any custom MCP servers</td></tr>
+  </table></div>
+
+  <h2>Step 1 — Decide what's portable</h2>
+  <p>Walk through your <code>.claude/</code> folder. For each item, ask: <em>"Would this work in a completely different repo, with a different structure?"</em></p>
+  <ul>
+    <li>If yes → portable, goes in the plugin</li>
+    <li>If no → stays in this repo's <code>.claude/</code></li>
+  </ul>
+
+  <h2>Step 2 — Set up the plugin folder</h2>
+  <p>Create a separate folder — could be inside your repo (e.g. <code>tooling/your-team-ai-layer/</code>) or in a completely separate repo (better for sharing across projects).</p>
+  <pre><code class="language-bash"><span class="tpl-repo">your-repo</span>-ai-layer/
+└── tooling/
+    ├── .claude-plugin/
+    │   └── marketplace.json     ← the marketplace manifest
+    └── your-team-ai-layer/
+        ├── .claude-plugin/
+        │   └── plugin.json       ← the plugin manifest
+        ├── hooks/
+        │   ├── hooks.json
+        │   ├── propose_claude_md.py
+        │   └── reflect_claude_md.py
+        ├── agents/
+        │   └── explorer.md
+        ├── skills/
+        │   └── scoped-tests/
+        │       └── SKILL.md
+        ├── mcp/                  ← if you have an MCP server
+        │   └── server.py
+        └── README.md
+</code></pre>
+
+  <h4>plugin.json</h4>
+  <pre><code class="language-json">{
+  "name": "your-team-ai-layer",
+  "version": "0.1.0",
+  "description": "Portable AI Layer: scoped-tests skill, self-improving CLAUDE.md hook, read-only explorer subagent. Install this and any repo gets the team's baseline Claude Code setup on day one.",
+  "author": { "name": "Your team" }
+}
+</code></pre>
+
+  <h4>marketplace.json</h4>
+  <pre><code class="language-json">{
+  "name": "your-team-tooling",
+  "owner": { "name": "Your team" },
+  "metadata": {
+    "description": "Internal marketplace for our Claude Code tooling."
+  },
+  "plugins": [
+    {
+      "name": "your-team-ai-layer",
+      "source": "./your-team-ai-layer",
+      "description": "The portable AI Layer."
+    }
+  ]
+}
+</code></pre>
+
+  <h2>Step 3 — Make hooks/agents/skills portable</h2>
+  <p>Anything in the plugin needs to reference its own directory via <code>${CLAUDE_PLUGIN_ROOT}</code> (the plugin's own path when installed). Update the hooks.json:</p>
+  <pre><code class="language-json">{
+  "hooks": {
+    "Stop": [
+      { "hooks": [{ "type": "command",
+        "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/propose_claude_md.py\"" }] }
+    ]
+  }
+}
+</code></pre>
+
+  <h2>Step 4 — Install &amp; test</h2>
+  <p>From another repo entirely (or after temporarily removing your <code>.claude/hooks/</code>):</p>
+  <pre><code class="language-bash">claude
+/plugin marketplace add /path/to/your-repo-ai-layer/tooling
+/plugin install your-team-ai-layer@your-team-tooling</code></pre>
+  <p>Verify the hook fires, the subagent is dispatchable, and the skill loads in the new repo. If any of those don't work, the most common cause is a path that references the original repo's structure — fix to use <code>${CLAUDE_PLUGIN_ROOT}</code>.</p>
+
+  <h2>Step 5 — Share</h2>
+  <p>Once it works, push the plugin to a git repo your teammates can clone. They run the two commands above against their clone, and they're set up.</p>
+
+  <h2>Checklist</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" id="p9-a"><label for="p9-a">Decided what's portable vs repo-specific</label></li>
+    <li><input type="checkbox" id="p9-b"><label for="p9-b">Created plugin folder structure</label></li>
+    <li><input type="checkbox" id="p9-c"><label for="p9-c">plugin.json and marketplace.json valid</label></li>
+    <li><input type="checkbox" id="p9-d"><label for="p9-d">All bundled scripts use <code>${CLAUDE_PLUGIN_ROOT}</code></label></li>
+    <li><input type="checkbox" id="p9-e"><label for="p9-e">Tested install in a different repo</label></li>
+  </ul>
+
+  <div class="pager"><a data-page="phase-8"><span class="pager-label">← Previous</span><span class="pager-title">11. Phase 8 — MCP</span></a><a class="next" data-page="maintenance"><span class="pager-label">Next →</span><span class="pager-title">13. Maintenance</span></a></div>
+</section>
+
+<!-- ============ 13 MAINTENANCE ============ -->
+<section class="page" id="page-maintenance">
+  <span class="section-num">13</span>
+  <div class="eyebrow">Reference</div>
+  <h1>Maintenance</h1>
+  <p class="lede">An AI Layer set up once and forgotten degrades. A small recurring review keeps it sharp.</p>
+
+  <h2>The 3–6 month review cadence</h2>
+  <p>Every three to six months, schedule an hour to walk through your AI Layer. The trigger for an off-cycle review: a major new model release, or a noticeable drop in agent quality.</p>
+
+  <h2>What to look at, in order</h2>
+
+  <h3>1. The accumulated <code>.claude/claude-md-review.md</code></h3>
+  <p>This file collects every proposed CLAUDE.md update from your Stop hook. Read through it. Apply the genuinely useful ones; ignore the noise; clear the file.</p>
+
+  <h3>2. CLAUDE.md drift</h3>
+  <p>Open each CLAUDE.md (root and subdirectory). Ask:</p>
+  <ul>
+    <li>Do the gotchas still describe real gotchas? (Were any fixed?)</li>
+    <li>Are the conventions still followed? (Or has the code drifted?)</li>
+    <li>Are the test/build commands still correct?</li>
+  </ul>
+  <p>Delete what's no longer true.</p>
+
+  <h3>3. Skills that exist to compensate for old model limits</h3>
+  <p>This one is subtle. Some skills exist because earlier models needed hand-holding ("always break refactors into single-file changes"). Newer models often handle those scenarios natively. <strong>Skills built to compensate for model weaknesses can become a drag once those weaknesses are gone.</strong></p>
+  <p>Audit each skill: is the limitation it works around still real? If not, delete the skill.</p>
+
+  <h3>4. Hooks that intercept what the model now does natively</h3>
+  <p>Same principle as skills. If you wrote a hook to enforce something the model used to skip, check whether the model still skips it. If not, the hook is overhead.</p>
+
+  <h3>5. New skills worth adding</h3>
+  <p>What workflows have you found yourself explaining repeatedly over the last quarter? Those are skill candidates. Run the skill-drafting prompt from Phase 5.</p>
+
+  <h2>The hardest discipline: deleting</h2>
+  <p>It feels productive to add things. It feels less productive to delete. But your AI Layer's quality is shaped by what's <em>not</em> in it as much as what is. Be ruthless.</p>
+
+  <h2>Re-verifying after major model updates</h2>
+  <p>When Anthropic ships a major Claude model release, do a focused review:</p>
+  <ol>
+    <li>Test your most common workflows against the new model with your current AI Layer.</li>
+    <li>Note where the new model behaves differently — better or worse.</li>
+    <li>Update CLAUDE.md, skills, and hooks accordingly.</li>
+    <li>Document what you changed and why (a short note in your repo).</li>
+  </ol>
+
+  <div class="pager"><a data-page="phase-9"><span class="pager-label">← Previous</span><span class="pager-title">12. Phase 9 — Plugin</span></a><a class="next" data-page="prompt-library"><span class="pager-label">Next →</span><span class="pager-title">14. Prompt library</span></a></div>
+</section>
+
+<!-- ============ 14 PROMPT LIBRARY ============ -->
+<section class="page" id="page-prompt-library">
+  <span class="section-num">14</span>
+  <div class="eyebrow">Reference</div>
+  <h1>Prompt library</h1>
+  <p class="lede">Every prompt from the workbook, in one place. Copy what you need.</p>
+
+  <h2>Discovery (Phase 2)</h2>
+  <pre><code class="language-markdown">Audit this codebase and recommend where CLAUDE.md files should go.
+
+For each candidate directory:
+1. Briefly explain what makes this area distinct
+2. List the 2-3 gotchas an editor of this area absolutely needs to know
+3. Note the scoped test/build command for this area, if there is one
+4. Assign a priority: 1 (essential), 2 (valuable), 3 (nice to have)
+
+Output as a single markdown table with these columns:
+Path | Domain/language | Gotchas | Scoped test command | Priority
+
+Do NOT create any CLAUDE.md files yet.</code></pre>
+
+  <h2>Drafting a CLAUDE.md (Phase 3)</h2>
+  <pre><code class="language-markdown">Draft a CLAUDE.md for the directory `[PATH]`.
+
+Follow these rules strictly:
+- Total length: under 60 lines
+- No facts obvious from file extensions
+- No facts already in the root CLAUDE.md
+- Lead with 3-5 gotchas an editor must know
+- Include the exact scoped test/build command
+- Bullet points, not paragraphs
+- Reference other CLAUDE.md files where relevant
+
+Read the actual code first. Look for shared state, error patterns,
+naming conventions, import boundaries, and unusual idioms.
+
+Output only the CLAUDE.md content.</code></pre>
+
+  <h2>Configuring LSP (Phase 4)</h2>
+  <pre><code class="language-markdown">Configure the code-intelligence plugin to use [LSP NAME — sourcekit-lsp
+or kotlin-language-server] for [LANGUAGE] files in [PATH]. Update
+.claude/settings.json if needed. Verify by finding all references to
+[SOME TYPE] and confirming you get clean file:line results without
+opening every file.</code></pre>
+
+  <h2>Drafting a skill (Phase 5)</h2>
+  <pre><code class="language-markdown">Draft a skill at `.claude/skills/[NAME]/SKILL.md` for:
+
+  [TASK DESCRIPTION]
+
+Rules:
+- YAML frontmatter (name, description, paths)
+- Description states clearly when to use this skill
+- paths: field restricts to relevant directories
+- SKILL.md under 50 lines
+- Numbered steps for procedures, tables for reference
+- For deep detail, stub references/[name].md and link to it
+
+Read [EXAMPLE FILE OR AREA] first so the skill matches reality.
+
+Output the SKILL.md content only.</code></pre>
+
+  <h2>Adapting a hook (Phase 6)</h2>
+  <pre><code class="language-markdown">I have a SessionStart hook script that prints active areas + recent
+commits at session start. Adapt it for my repo:
+
+- My repo root has these subdirectories: [LIST]
+- My version control is [git / other]
+- My exclude patterns should be: [LIST]
+
+Keep the layout-agnostic logic — it should detect CLAUDE.md-governed
+areas, not assume any specific folder names.
+
+Output the adapted script.</code></pre>
+
+  <h2>Reviewing a draft</h2>
+  <pre><code class="language-markdown">Review this CLAUDE.md / skill / hook draft against the rules in
+[The AI Layer Workbook]. Specifically check:
+
+1. Is anything in it untrue? (Verify against the actual code.)
+2. Is anything in it redundant with what's already in the root CLAUDE.md
+   or another skill?
+3. Is anything in it too long or too detailed for its purpose?
+
+Suggest specific edits as line-by-line deletions or rewrites.</code></pre>
+
+  <h2>Mapping a subsystem (Phase 7)</h2>
+  <pre><code class="language-markdown">Use the explorer subagent to map [SUBSYSTEM PATH] and report back
+under these headings: Entry points, Key types &amp; functions,
+Dependencies, Gotchas, Suggested fixes (described, not applied).</code></pre>
+
+  <h2>Six-month review (Maintenance)</h2>
+  <pre><code class="language-markdown">It's been six months since I set up my AI Layer. Walk through:
+
+1. Open .claude/claude-md-review.md and identify the proposed CLAUDE.md
+   updates that are still relevant and worth applying.
+2. Read each CLAUDE.md (root and subdirectories) and flag any gotchas,
+   conventions, or commands that no longer match reality.
+3. Read each skill and flag any that exist to compensate for a model
+   limitation that's likely been resolved.
+4. Read each hook and ask the same question.
+5. Note workflows I've explained more than twice this quarter — those
+   are candidates for new skills.
+
+Output a structured report. Don't make changes yet — I'll review and
+apply them in a second pass.</code></pre>
+
+  <div class="pager"><a data-page="maintenance"><span class="pager-label">← Previous</span><span class="pager-title">13. Maintenance</span></a><a class="next" data-page="glossary"><span class="pager-label">Next →</span><span class="pager-title">15. Glossary</span></a></div>
+</section>
+
+<!-- ============ 15 GLOSSARY ============ -->
+<section class="page" id="page-glossary">
+  <span class="section-num">15</span>
+  <div class="eyebrow">Reference</div>
+  <h1>Glossary</h1>
+  <p class="lede">Every technical term, in plain language.</p>
+
+  <dl class="kvgrid" id="glossaryList">
+    <dt>Agent</dt><dd>A program that uses an AI model to read, write, and run things on your behalf. Claude Code, Codex, Cursor, and Cline are all agents.</dd>
+    <dt>AI Layer</dt><dd>The bundle of configuration and tooling — CLAUDE.md files, hooks, skills, subagents, LSP, MCP, plugins — that makes a codebase navigable for an AI agent. Cole Medin's term; the article calls it "the harness."</dd>
+    <dt>AST</dt><dd>Abstract Syntax Tree. A structured representation of code that knows the difference between a function definition and a comment that just mentions the function's name. Powers precise code search.</dd>
+    <dt>CLAUDE.md</dt><dd>A markdown file Claude Code reads automatically. A root file holds repo-wide truths; subdirectory files hold local conventions.</dd>
+    <dt>CLI</dt><dd>Command-Line Interface. A program you run by typing commands in a terminal. Claude Code is a CLI tool.</dd>
+    <dt>Context (or context window)</dt><dd>The agent's short-term memory for the current session. Finite. Every file read, every command output, every line of conversation consumes some of it.</dd>
+    <dt>Frontmatter</dt><dd>The block at the top of a markdown file between two <code>---</code> lines, holding structured metadata (name, description, paths). Used in skills and subagents.</dd>
+    <dt>Grep</dt><dd>A text-search command. Fast and useful, but finds the search term anywhere — in code, in comments, in strings — without knowing the difference.</dd>
+    <dt>Hook</dt><dd>A script Claude Code runs automatically at a specific lifecycle moment (session start, after a tool call, etc.).</dd>
+    <dt>LSP</dt><dd>Language Server Protocol. A system that gives an editor (or an agent) symbol-level understanding of code — go-to-definition, find-references, type information.</dd>
+    <dt>MCP</dt><dd>Model Context Protocol. A standard for plugging external tools into AI agents. An MCP server exposes custom tools the agent can call.</dd>
+    <dt>Monorepo</dt><dd>A single git repo holding many related projects (multiple services, multiple packages, sometimes multiple platforms).</dd>
+    <dt>Path glob</dt><dd>A pattern that matches file paths. <code>ios/**</code> matches everything under <code>ios/</code> at any depth. Used in skills' <code>paths:</code> field.</dd>
+    <dt>Plugin</dt><dd>An installable bundle of skills, hooks, and MCP servers. Lets a team distribute its AI Layer in one command.</dd>
+    <dt>Progressive disclosure</dt><dd>The design principle that a skill's main file is short, with deeper details in linked reference files that load only when needed.</dd>
+    <dt>RAG</dt><dd>Retrieval-Augmented Generation. An older approach where the codebase is indexed and chunks are retrieved at query time. Doesn't scale well in actively-developed codebases.</dd>
+    <dt>Repository (repo)</dt><dd>A folder under version control (almost always git). The unit Claude Code operates on.</dd>
+    <dt>Session</dt><dd>One continuous conversation with the agent, from <code>claude</code> until you close the terminal or run <code>/clear</code>.</dd>
+    <dt>Skill</dt><dd>A folder with a <code>SKILL.md</code> file declaring reusable expertise. Loads only when relevant — scoped via the <code>paths:</code> field.</dd>
+    <dt>Standard input / output / error</dt><dd>The three default streams a program can read from or write to. Hooks receive a payload on standard input and inject context by writing to standard output.</dd>
+    <dt>Subagent</dt><dd>A separate Claude Code instance launched by the main agent. Has its own context window. Used to split exploration from editing.</dd>
+    <dt>Symbol</dt><dd>A named code element — a function, class, variable, constant. LSP-based search finds symbols precisely; grep finds <em>text</em> that may or may not be a symbol.</dd>
+    <dt>YAML frontmatter</dt><dd>See <em>Frontmatter</em>. YAML is the syntax used inside the <code>---</code> block.</dd>
+  </dl>
+
+  <div class="pager"><a data-page="prompt-library"><span class="pager-label">← Previous</span><span class="pager-title">14. Prompt library</span></a><span></span></div>
+</section>
+
+</main>
+</div>
+
+<div class="glossary-popup" id="glossaryPopup"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-swift.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js"></script>
+
+<script>
+// =========================================================================
+// Storage abstraction — uses window.storage if present, falls back to localStorage
+// =========================================================================
+const Storage = {
+  async get(key) {
+    try {
+      if (window.storage?.get) {
+        const r = await window.storage.get(key);
+        return r?.value ?? null;
+      }
+    } catch (e) {}
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  },
+  async set(key, value) {
+    try {
+      if (window.storage?.set) {
+        await window.storage.set(key, value);
+        return;
+      }
+    } catch (e) {}
+    try { localStorage.setItem(key, value); } catch (e) {}
+  }
+};
+
+// =========================================================================
+// Navigation
+// =========================================================================
+const pages = ['start','mental-models','how-it-works','your-picture',
+  'phase-1','phase-2','phase-3','phase-4','phase-5','phase-6','phase-7',
+  'phase-8','phase-9','maintenance','prompt-library','glossary'];
+
+function showPage(name) {
+  if (!pages.includes(name)) name = 'start';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === name);
+  });
+  history.replaceState(null, '', '#/' + name);
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('scrim').classList.remove('shown');
+  markVisited(name);
+}
+
+function getInitialPage() {
+  const hash = window.location.hash.replace('#/','');
+  return pages.includes(hash) ? hash : 'start';
+}
+
+document.querySelectorAll('[data-page]').forEach(el => {
+  el.addEventListener('click', e => {
+    e.preventDefault();
+    showPage(el.dataset.page);
+  });
+});
+
+// =========================================================================
+// Visited tracking (lightweight — checkmark on nav items)
+// =========================================================================
+let visited = new Set();
+async function loadVisited() {
+  const v = await Storage.get('workbook:visited');
+  if (v) try { visited = new Set(JSON.parse(v)); } catch (e) {}
+  refreshVisitedUI();
+}
+function markVisited(name) {
+  visited.add(name);
+  Storage.set('workbook:visited', JSON.stringify([...visited]));
+  refreshVisitedUI();
+}
+function refreshVisitedUI() {
+  document.querySelectorAll('.nav-item').forEach(n => {
+    const check = n.querySelector('.nav-check');
+    if (check) check.classList.toggle('shown', visited.has(n.dataset.page));
+  });
+}
+
+// =========================================================================
+// Checklist persistence
+// =========================================================================
+async function loadChecklist() {
+  const saved = await Storage.get('workbook:checks');
+  let state = {};
+  if (saved) try { state = JSON.parse(saved); } catch (e) {}
+  document.querySelectorAll('.checklist input[type=checkbox]').forEach(cb => {
+    if (state[cb.id]) {
+      cb.checked = true;
+      cb.closest('li').classList.add('done');
+    }
+    cb.addEventListener('change', () => {
+      cb.closest('li').classList.toggle('done', cb.checked);
+      saveChecklist();
+    });
+  });
+}
+function saveChecklist() {
+  const state = {};
+  document.querySelectorAll('.checklist input[type=checkbox]').forEach(cb => {
+    if (cb.checked) state[cb.id] = true;
+  });
+  Storage.set('workbook:checks', JSON.stringify(state));
+}
+
+// =========================================================================
+// Theme toggle
+// =========================================================================
+async function initTheme() {
+  const saved = await Storage.get('workbook:theme');
+  document.documentElement.dataset.theme = saved || 'light';
+}
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = document.documentElement.dataset.theme;
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  Storage.set('workbook:theme', next);
+});
+
+// =========================================================================
+// Mobile sidebar
+// =========================================================================
+document.getElementById('menuBtn').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('scrim').classList.toggle('shown');
+});
+document.getElementById('scrim').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('scrim').classList.remove('shown');
+});
+
+// =========================================================================
+// Copy buttons on code blocks
+// =========================================================================
+function addCopyButtons() {
+  document.querySelectorAll('pre').forEach(pre => {
+    if (pre.querySelector('.copy-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', async () => {
+      const code = pre.querySelector('code')?.innerText || pre.innerText;
+      try {
+        await navigator.clipboard.writeText(code);
+        btn.textContent = 'Copied ✓';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 1800);
+      } catch (e) {
+        btn.textContent = 'Failed';
+      }
+    });
+    pre.appendChild(btn);
+  });
+}
+
+// =========================================================================
+// Personalization
+// =========================================================================
+const persona = {
+  repoName: 'your-repo',
+  languages: [],
+  layout: 'single',
+  topLevelDirs: ''
+};
+const agent = { name: 'Claude Code' };
+
+async function loadPersona() {
+  const saved = await Storage.get('workbook:persona');
+  if (saved) try { Object.assign(persona, JSON.parse(saved)); } catch (e) {}
+  const savedAgent = await Storage.get('workbook:agent');
+  if (savedAgent) agent.name = savedAgent;
+
+  document.getElementById('repoName').value = persona.repoName === 'your-repo' ? '' : persona.repoName;
+  document.getElementById('layout').value = persona.layout;
+  document.getElementById('topLevelDirs').value = persona.topLevelDirs;
+  document.querySelectorAll('#langGrid input').forEach(cb => {
+    cb.checked = persona.languages.includes(cb.value);
+  });
+  document.getElementById('agentPicker').value = agent.name;
+  applyPersona();
+}
+
+function applyPersona() {
+  const repoLabel = persona.repoName && persona.repoName.trim() ? persona.repoName.trim() : 'your-repo';
+  document.querySelectorAll('.tpl-repo').forEach(el => el.textContent = repoLabel);
+  document.querySelectorAll('.tpl-agent').forEach(el => el.textContent = agent.name);
+}
+
+document.getElementById('personalizeBtn').addEventListener('click', () => {
+  persona.repoName = document.getElementById('repoName').value.trim() || 'your-repo';
+  persona.layout = document.getElementById('layout').value;
+  persona.topLevelDirs = document.getElementById('topLevelDirs').value;
+  persona.languages = [...document.querySelectorAll('#langGrid input:checked')].map(c => c.value);
+  Storage.set('workbook:persona', JSON.stringify(persona));
+  applyPersona();
+  const status = document.getElementById('personalizeStatus');
+  status.textContent = '✓ Saved. Workbook updated.';
+  setTimeout(() => status.textContent = '', 3000);
+});
+
+document.getElementById('agentPicker').addEventListener('change', e => {
+  agent.name = e.target.value;
+  Storage.set('workbook:agent', agent.name);
+  applyPersona();
+});
+
+// =========================================================================
+// Glossary popups
+// =========================================================================
+const glossaryDefs = {
+  'CLAUDE.md': 'A markdown file Claude Code reads automatically. The root file holds repo-wide rules; subdirectory files hold local conventions for that area.',
+  'Hook': 'A script Claude Code runs automatically at a specific moment — session start, after a tool runs, when the agent finishes responding, etc.',
+  'Skill': 'A folder with a SKILL.md file declaring reusable expertise. Auto-loads when relevant based on its paths field.',
+  'Subagent': 'A separate Claude Code instance with its own context window. Used to split exploration (read-only) from editing (the main agent).',
+  'LSP': 'Language Server Protocol — gives the agent symbol-level navigation (go-to-definition, find-references) instead of text-only search.',
+  'MCP': 'Model Context Protocol — a standard way to plug external tools and data sources into the agent.',
+  'Plugin': 'A bundle of skills, hooks, and MCP servers that can be installed in one command. Distributes a working AI Layer to teammates.'
+};
+
+const popup = document.getElementById('glossaryPopup');
+document.body.addEventListener('mouseover', e => {
+  const term = e.target.closest('.glossary-term');
+  if (!term) return;
+  const def = glossaryDefs[term.dataset.term];
+  if (!def) return;
+  popup.innerHTML = `<strong>${term.dataset.term}</strong>${def}`;
+  popup.classList.add('shown');
+  const r = term.getBoundingClientRect();
+  const x = Math.min(r.left, window.innerWidth - 300);
+  const y = r.bottom + 6;
+  popup.style.left = x + 'px';
+  popup.style.top = y + 'px';
+});
+document.body.addEventListener('mouseout', e => {
+  const term = e.target.closest('.glossary-term');
+  if (term) popup.classList.remove('shown');
+});
+document.body.addEventListener('click', e => {
+  const term = e.target.closest('.glossary-term');
+  if (!term) {
+    popup.classList.remove('shown');
+    return;
+  }
+  const def = glossaryDefs[term.dataset.term];
+  if (!def) return;
+  popup.innerHTML = `<strong>${term.dataset.term}</strong>${def}`;
+  popup.classList.add('shown');
+  const r = term.getBoundingClientRect();
+  const x = Math.min(r.left, window.innerWidth - 300);
+  const y = r.bottom + 6;
+  popup.style.left = x + 'px';
+  popup.style.top = y + 'px';
+});
+
+// =========================================================================
+// Init
+// =========================================================================
+(async function init() {
+  await initTheme();
+  await loadVisited();
+  await loadChecklist();
+  await loadPersona();
+  addCopyButtons();
+  showPage(getInitialPage());
+  if (window.Prism) Prism.highlightAll();
+})();
+
+window.addEventListener('hashchange', () => showPage(getInitialPage()));
+</script>
+
+</body>
+</html>
