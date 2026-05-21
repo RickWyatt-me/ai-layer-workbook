@@ -1037,3 +1037,170 @@ details[open] summary::before {
 [data-theme='light'] .token.number {
   color: #b6452c;
 }
+
+/* Settings dialog */
+
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.settings-dialog {
+  background: var(--bg-elev);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 1.5rem;
+  width: calc(100% - 2rem);
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.settings-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.settings-dialog h2 {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.settings-dialog__section {
+  margin-block: 1.25rem;
+  padding-block-end: 1rem;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.settings-dialog__section:last-child,
+.settings-dialog__section--last {
+  border-bottom: none;
+  padding-block-end: 0;
+}
+
+.settings-dialog__hint {
+  font-size: 0.82rem;
+  color: var(--ink-mute);
+  margin: 0.4rem 0 0;
+  line-height: 1.5;
+}
+
+.settings-dialog__hint code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--accent-bg);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+.settings-dialog__theme-btn {
+  margin-top: 0.2rem;
+}
+
+.settings-dialog__edit-link {
+  display: inline-block;
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.settings-privacy h3 {
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  font-weight: 500;
+  margin: 1rem 0 0.3rem;
+}
+
+.settings-privacy h3:first-child {
+  margin-top: 0;
+}
+
+.settings-privacy p,
+.settings-privacy ul {
+  margin: 0 0 0.5rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.settings-privacy ul {
+  padding-left: 1.2rem;
+}
+
+.settings-privacy code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--accent-bg);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+.settings-clear-btn {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--body);
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.settings-clear-btn:hover,
+.settings-clear-btn:focus-visible {
+  background: var(--accent);
+  color: var(--bg);
+  outline: none;
+}
+
+.settings-clear-btn--confirm {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.settings-clear-btn--confirm:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+}
+
+.settings-confirm p {
+  margin: 0 0 0.6rem;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.settings-confirm__actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .settings-backdrop {
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .settings-dialog {
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+    max-height: none;
+    border-radius: 0;
+    padding: 1rem;
+    border: none;
+  }
+}

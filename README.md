@@ -29,6 +29,11 @@ npm run lint
 npm run format:check
 ```
 
+Open the **Settings** panel via the gear button (⚙) in the top bar to paste
+your Anthropic API key and (optionally) a GitHub PAT. Keys are stored in this
+browser's `localStorage` only — they are never sent anywhere except to the
+destination service when an AI feature uses them.
+
 ## Project layout
 
 ```

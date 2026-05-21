@@ -1,6 +1,7 @@
 export const STORAGE_KEYS = {
   theme: 'aiLayer.theme',
   agent: 'aiLayer.agent',
+  settings: 'aiLayer.settings',
   persona: 'workbook:persona',
   checks: 'workbook:checks',
 } as const;
