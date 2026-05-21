@@ -1,0 +1,28 @@
+/* Placeholder. The full v1 stylesheet will be ported here verbatim in step 3. */
+
+:root {
+  --bg: #f4efe6;
+  --bg-elev: #faf6ee;
+  --ink: #1f1a14;
+  --ink-soft: #5a5048;
+  --accent: #b6452c;
+  --serif: 'Fraunces', Georgia, serif;
+  --body: 'Newsreader', Georgia, serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}

@@ -8,10 +8,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Name:** `ai-layer-workbook`
 - **Purpose:** Plain-language, step-by-step workbook teaching non-technical-but-capable builders how to set up Claude Code in a large codebase. Going from v1 (single-file HTML prototype) to v3 (live AI-powered site at `ai-layer.roipros.com`).
-- **Stack:** TBD — pre-implementation. Recommended stack is Vite + React + TypeScript per handoff §5, no UI framework, no state library, static deploy to Cloudflare Pages.
+- **Stack:** Vite + React + TypeScript, no UI framework, no state library, static deploy to Cloudflare Pages (confirmed; scaffolding pending).
 - **Repo:** https://github.com/RickWyatt-me/ai-layer-workbook (public, MIT)
-- **Brain corpus tag:** not yet registered — run `/brain-onboard` after this init
+- **Brain corpus tag:** `ai-layer-workbook` (registered, `shareable`, type `mixed`)
 - **Sensitivity:** `shareable` (repo is public)
+- **Production URL:** `ai-layer.roipros.com` (Cloudflare Pages, DNS setup pending)
 
 ---
 
@@ -24,9 +25,18 @@ This repo is **pre-implementation**. It contains exactly two source artifacts:
 
 There is no `package.json`, no build, no framework chosen yet. You are starting fresh, using v1 as the content/aesthetic reference.
 
-## Before you start coding
+## Resolved decisions (handoff §13)
 
-The handoff brief (§13) lists eight open questions — repo visibility (resolved: public), hosting, subdomain, BYOK confirmation, model defaults, L3 feature order, brand assets, analytics. **Ask the remaining ones in your first turn and wait for answers.** Do not scaffold a project or pick a stack until they are resolved.
+All eight open questions are answered. Do not re-ask:
+
+1. **Repo visibility** — public, MIT.
+2. **Hosting** — Cloudflare Pages (account + DNS setup still pending — owner will configure).
+3. **Subdomain** — `ai-layer.roipros.com`.
+4. **API key model** — BYOK only. No backend, no proxy, ever.
+5. **Model defaults** — `claude-opus-4-7` for primary generate (C1–C4); `claude-haiku-4-5-20251001` for fast small jobs. Configurable in settings.
+6. **L3 feature order** — Port → Capability A (Settings) → Capability B (GitHub fetch) → C1 Audit → C2 Draft Root CLAUDE.md → C3 Draft Sub-CLAUDE.md → C4 Draft Skill. Ship between each capability for owner feedback. Do not parallel-track.
+7. **Brand assets** — generate placeholders in the workbook aesthetic; owner does not have ROI Pros assets yet. Flag them as placeholders in the README so they can be swapped later.
+8. **Analytics** — Cloudflare Web Analytics at launch (free, cookieless, no consent banner needed, zero JS-bundle cost). One toggle in the CF Pages dashboard once deployed.
 
 ## What v3 is
 

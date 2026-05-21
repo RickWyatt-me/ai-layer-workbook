@@ -1,0 +1,9 @@
+dist
+node_modules
+ai-layer-workbook-v1.html
+package-lock.json
+
+# Long-form prose docs — keep authored formatting
+CLAUDE.md
+ROADMAP.md
+Docs/

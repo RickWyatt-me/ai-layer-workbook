@@ -7,19 +7,26 @@ Thumbs.db
 .idea/
 *.swp
 
-# Node / Vite (anticipated for v3 build)
+# Node / Vite
 node_modules/
 dist/
 .vite/
+*.tsbuildinfo
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Brain corpus extraction artifacts
+graphify-out/
 
 # Local env / secrets
 .env
 .env.local
 .env.*.local
 
-# Claude Code local settings (symlinks to ~/Documents/AI-Projects/ai-workflow)
-.claude/
+# Claude Code — commit the project-scoped pieces, but exclude per-user overrides
+# and hook-generated artifacts
+.claude/settings.local.json
+.claude/claude-md-review.md
+.claude/.claude-md-review-state
