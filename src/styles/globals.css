@@ -1,3 +1,9 @@
+/* Ported from ai-layer-workbook-v1.html lines 11-203.
+   Three React-only divergences documented inline:
+   - react: v1 used `.sidebar.open` — adapted to current shell's `.app.drawer-open .sidebar` selector
+   - react: pager classes match Pager.tsx (.pager-link/.pager-prev/.pager-next/.pager-direction/.pager-title), not v1's `.pager a`
+   - react: `.page` does NOT toggle `.active` — React renders one section at a time, so v1's `.page{display:none}` + `.page.active{display:block}` + fadeIn keyframe are omitted. */
+
 :root {
   --bg: #f4efe6;
   --bg-elev: #faf6ee;
@@ -8,7 +14,12 @@
   --rule: #d9cfbe;
   --rule-soft: #e8decc;
   --accent: #b6452c;
+  --accent-soft: #d67b5f;
   --accent-bg: rgba(182, 69, 44, 0.08);
+  --ok: #3f6b3a;
+  --warn: #8a6914;
+  --shadow:
+    0 1px 0 rgba(31, 26, 20, 0.04), 0 8px 24px -12px rgba(31, 26, 20, 0.12);
   --serif: 'Fraunces', Georgia, serif;
   --body: 'Newsreader', Georgia, serif;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
@@ -24,7 +35,9 @@
   --rule: #2e2922;
   --rule-soft: #241f19;
   --accent: #e67a5c;
+  --accent-soft: #c46347;
   --accent-bg: rgba(230, 122, 92, 0.1);
+  --shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
 }
 
 * {
@@ -41,12 +54,22 @@ body {
   font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'ss01', 'ss02', 'liga', 'kern';
+}
+
+body {
+  min-height: 100vh;
 }
 
 a {
   color: var(--accent);
   text-decoration: none;
   border-bottom: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  transition: border-color 0.15s;
+}
+
+a:hover {
+  border-bottom-color: var(--accent);
 }
 
 h1,
@@ -61,9 +84,46 @@ h4 {
 }
 
 h1 {
-  font-size: 2.6rem;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
   line-height: 1.05;
   font-weight: 400;
+  font-variation-settings: 'opsz' 120;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  line-height: 1.15;
+  font-weight: 500;
+  font-variation-settings: 'opsz' 48;
+  margin: 2.5rem 0 1rem;
+}
+
+h3 {
+  font-size: 1.2rem;
+  line-height: 1.3;
+  font-weight: 600;
+  margin: 1.8rem 0 0.6rem;
+  color: var(--ink);
+}
+
+h4 {
+  font-family: var(--body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin: 1.2rem 0 0.3rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 2.5rem 0;
 }
 
 code {
@@ -73,14 +133,70 @@ code {
   color: var(--accent);
   padding: 0.1em 0.35em;
   border-radius: 3px;
+  font-weight: 500;
 }
 
-hr {
-  border: 0;
-  border-top: 1px solid var(--rule);
-  margin: 2.5rem 0;
+pre {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  position: relative;
+  font-size: 0.82rem;
+  line-height: 1.6;
 }
 
+pre code {
+  background: none;
+  color: var(--ink);
+  padding: 0;
+  font-size: inherit;
+  font-weight: 400;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--rule);
+  color: var(--ink-soft);
+  padding: 0.25rem 0.55rem;
+  font-family: var(--body);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.15s,
+    background 0.15s,
+    color 0.15s;
+}
+
+pre:hover .copy-btn,
+pre:focus-within .copy-btn {
+  opacity: 1;
+}
+
+.copy-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.copy-btn.copied {
+  background: var(--ok);
+  color: #fff;
+  border-color: var(--ok);
+  opacity: 1;
+}
+
+/* layout */
 .app {
   display: grid;
   grid-template-columns: 280px 1fr;
@@ -95,6 +211,8 @@ hr {
   background: var(--bg-elev);
   border-right: 1px solid var(--rule);
   padding: 1.5rem 1.2rem 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .brand {
@@ -108,6 +226,8 @@ hr {
   font-weight: 400;
   font-size: 1.4rem;
   line-height: 1.1;
+  font-variation-settings: 'opsz' 144;
+  color: var(--ink);
 }
 
 .brand-sub {
@@ -116,6 +236,7 @@ hr {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-top: 0.4rem;
+  font-family: var(--body);
 }
 
 .nav-section {
@@ -124,6 +245,7 @@ hr {
 
 .nav-label {
   font-size: 0.65rem;
+  font-family: var(--body);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-mute);
@@ -141,11 +263,15 @@ hr {
   color: var(--ink-soft);
   font-size: 0.88rem;
   cursor: pointer;
+  transition:
+    background 0.12s,
+    color 0.12s;
   border: none;
   background: none;
   width: 100%;
   text-align: left;
   text-decoration: none;
+  font-family: var(--body);
   line-height: 1.3;
 }
 
@@ -161,6 +287,7 @@ hr {
 
 .nav-num {
   font-family: var(--serif);
+  font-variation-settings: 'opsz' 9;
   font-weight: 600;
   font-size: 0.78rem;
   width: 1.4rem;
@@ -172,17 +299,17 @@ hr {
   color: var(--accent);
 }
 
-.tag {
-  display: inline-block;
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0.1em 0.4em;
-  border-radius: 3px;
-  background: var(--rule-soft);
-  color: var(--ink-mute);
-  margin-left: 0.4rem;
-  vertical-align: 1px;
+.nav-check {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: var(--ok);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.nav-check.shown {
+  opacity: 1;
 }
 
 .main-wrap {
@@ -196,6 +323,7 @@ hr {
   top: 0;
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--rule);
   padding: 0.7rem 2rem;
   display: flex;
@@ -220,9 +348,10 @@ hr {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.6rem;
 }
 
+/* react: agent picker is React-only (not in v1) */
 .agent-picker {
   display: inline-flex;
   align-items: center;
@@ -235,6 +364,7 @@ hr {
   text-transform: uppercase;
   color: var(--ink-mute);
   font-weight: 600;
+  font-family: var(--body);
 }
 
 .picker {
@@ -260,22 +390,31 @@ hr {
   align-items: center;
   justify-content: center;
   font-size: 1rem;
+  transition: background 0.12s;
 }
 
 .icon-btn:hover {
   background: var(--accent-bg);
 }
 
-.main {
-  padding: 2.5rem 2rem 6rem;
+/* react: drawer close button hidden on desktop, shown on mobile (see @media below) */
+.drawer-close {
+  display: none;
 }
 
+.main {
+  padding: 2.5rem 2rem 6rem;
+  max-width: none;
+}
+
+/* react: omits v1's `.page{display:none}` + `.page.active{display:block}` + fadeIn keyframe — React renders one section at a time */
 .page {
   max-width: 760px;
   margin: 0 auto;
 }
 
 .eyebrow {
+  font-family: var(--body);
   font-size: 0.72rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -298,7 +437,8 @@ hr {
 .lede {
   font-family: var(--serif);
   font-weight: 300;
-  font-size: 1.2rem;
+  font-variation-settings: 'opsz' 32;
+  font-size: 1.3rem;
   line-height: 1.45;
   color: var(--ink-soft);
   margin: 1rem 0 2rem;
@@ -306,72 +446,586 @@ hr {
   font-style: italic;
 }
 
-.pager {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  margin-top: 2.5rem;
+.callout {
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1.5rem 0;
 }
 
-.pager-link {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+.callout-title {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout.ok {
+  border-left-color: var(--ok);
+}
+
+.callout.ok .callout-title {
+  color: var(--ok);
+}
+
+.callout.warn {
+  border-left-color: var(--warn);
+}
+
+.callout.warn .callout-title {
+  color: var(--warn);
+}
+
+.kvgrid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1.2rem;
+  font-size: 0.92rem;
+  margin: 1rem 0;
+}
+
+.kvgrid dt {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.kvgrid dd {
+  margin: 0;
   color: var(--ink-soft);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin: 1.2rem 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+th {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  background: var(--bg-elev);
+}
+
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px dashed var(--rule-soft);
+}
+
+.checklist input[type='checkbox'] {
+  margin-top: 0.4rem;
+  accent-color: var(--accent);
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.checklist label {
+  cursor: pointer;
+  flex: 1;
+}
+
+.checklist li.done label {
+  color: var(--ink-mute);
+  text-decoration: line-through;
+}
+
+.tag {
+  display: inline-block;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-family: var(--body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.18rem 0.5rem;
+  border-radius: 3px;
+  font-weight: 600;
+  margin-right: 0.4rem;
+}
+
+.tag.gray {
+  background: var(--rule-soft);
+  color: var(--ink-mute);
+}
+
+.tag.ok {
+  background: rgba(63, 107, 58, 0.12);
+  color: var(--ok);
+}
+
+details {
   border: 1px solid var(--rule);
   border-radius: 6px;
   padding: 0.7rem 1rem;
-  text-decoration: none;
+  margin: 1rem 0;
   background: var(--bg-card);
-  flex: 1 1 0;
+}
+
+details[open] {
+  padding-bottom: 1rem;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-family: var(--body);
+  font-size: 0.92rem;
+  color: var(--ink);
+  outline: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary::before {
+  content: '+';
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.2rem;
+  color: var(--accent);
+  width: 1rem;
+  display: inline-block;
+  transition: transform 0.15s;
+}
+
+details[open] summary::before {
+  content: '−';
+}
+
+.glossary-term {
+  border-bottom: 1px dashed var(--accent);
+  cursor: help;
+  color: var(--ink);
+}
+
+.glossary-popup {
+  position: fixed;
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 0.9rem 1.1rem;
+  max-width: 280px;
+  box-shadow: var(--shadow);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  z-index: 100;
+  display: none;
+  pointer-events: none;
+}
+
+.glossary-popup strong {
+  display: block;
+  font-family: var(--serif);
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: var(--accent);
+}
+
+.glossary-popup.shown {
+  display: block;
+  pointer-events: auto;
+}
+
+.persona-card {
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 1.4rem 1.5rem;
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.persona-card h3 {
+  margin-top: 0;
+}
+
+.persona-field {
+  margin-bottom: 0.9rem;
+}
+
+.persona-field label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  font-family: var(--body);
+}
+
+.persona-field input,
+.persona-field textarea,
+.persona-field select {
+  width: 100%;
+  font-family: var(--body);
+  font-size: 0.92rem;
+  padding: 0.5rem 0.7rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  border-radius: 4px;
+}
+
+.persona-field input:focus,
+.persona-field textarea:focus,
+.persona-field select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.persona-field textarea {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  min-height: 90px;
+  resize: vertical;
+}
+
+.lang-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.5rem;
+}
+
+.lang-grid label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: var(--bg-elev);
+  border: 1px solid var(--rule);
+  padding: 0.45rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--body);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.lang-grid label:has(input:checked) {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lang-grid input {
+  accent-color: var(--accent);
+  margin: 0;
+}
+
+.btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  padding: 0.55rem 1.1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.btn:hover {
+  background: var(--accent-soft);
+}
+
+.btn.ghost {
+  background: none;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.btn.ghost:hover {
+  background: var(--accent-bg);
+}
+
+.phase-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin: 1.2rem 0 2rem;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  padding: 0.7rem 1rem;
+  background: var(--bg-elev);
+  border-radius: 6px;
+  border-left: 3px solid var(--accent);
+}
+
+.phase-meta span {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.phase-meta strong {
+  color: var(--ink);
+  font-family: var(--body);
+  font-weight: 600;
+}
+
+/* react: pager classes match Pager.tsx, not v1's `.pager a` */
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--rule);
+}
+
+.pager-link {
+  flex: 1;
+  padding: 1rem 1.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--body);
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
   min-width: 0;
+}
+
+.pager-link:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent);
 }
 
 .pager-prev {
   text-align: left;
 }
+
 .pager-next {
   text-align: right;
 }
 
 .pager-direction {
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent);
-  font-weight: 600;
+  color: var(--ink-mute);
 }
 
 .pager-title {
   font-family: var(--serif);
+  font-weight: 500;
   font-size: 1rem;
   color: var(--ink);
 }
 
+.origin-block {
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 1.5rem 1.7rem;
+  margin: 2rem 0;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.origin-block h3 {
+  margin-top: 0;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-variation-settings: 'opsz' 48;
+  color: var(--accent);
+}
+
+.origin-block ul {
+  padding-left: 1.2rem;
+  margin: 0.5rem 0 0;
+}
+
+.origin-block li {
+  margin-bottom: 0.35rem;
+  color: var(--ink-soft);
+}
+
+.section-num {
+  font-family: var(--serif);
+  font-variation-settings: 'opsz' 144;
+  font-weight: 300;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.6;
+  margin-bottom: 0.5rem;
+  display: block;
+  letter-spacing: -0.02em;
+}
+
+/* react: scrim is React-mounted only when drawer is open; base rule is hidden so a stray render on desktop is invisible/non-clickable */
+.sidebar-scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* mobile */
 @media (max-width: 900px) {
   .app {
     grid-template-columns: 1fr;
   }
   .sidebar {
     position: fixed;
-    left: -300px;
-    width: 280px;
-    transition: left 0.2s;
-    z-index: 20;
-  }
-  .app.drawer-open .sidebar {
+    top: 0;
     left: 0;
+    width: 280px;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 8px 0 24px -8px rgba(0, 0, 0, 0.2);
+  }
+  /* react: v1 used `.sidebar.open` — adapted to current shell's `.app.drawer-open .sidebar` */
+  .app.drawer-open .sidebar {
+    transform: translateX(0);
   }
   .menu-btn {
-    display: inline-flex;
+    display: block;
   }
   .main {
-    padding: 2rem 1.2rem 5rem;
+    padding: 1.5rem 1.2rem 5rem;
   }
   .topbar {
-    padding: 0.7rem 1rem;
+    padding: 0.6rem 1rem;
   }
-  .agent-picker-label {
-    display: none;
+  .sidebar-scrim {
+    display: block;
   }
+  .brand {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+  .drawer-close {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+  body {
+    font-size: 16px;
+  }
+  pre {
+    font-size: 0.78rem;
+  }
+  .section-num {
+    font-size: 2.5rem;
+  }
+  .lede {
+    font-size: 1.15rem;
+  }
+  .pager {
+    flex-direction: column;
+  }
+  .topbar-right .picker {
+    max-width: 120px;
+    font-size: 0.75rem;
+  }
+}
+
+/* dark prism overrides */
+[data-theme='dark'] pre {
+  background: #1a1814 !important;
+  border-color: var(--rule);
+}
+
+[data-theme='dark'] .token.comment {
+  color: #857c6e;
+}
+
+[data-theme='dark'] .token.string {
+  color: #e6b176;
+}
+
+[data-theme='dark'] .token.keyword {
+  color: #e67a5c;
+}
+
+[data-theme='dark'] .token.function {
+  color: #c9a063;
+}
+
+[data-theme='dark'] .token.number {
+  color: #d67b5f;
+}
+
+[data-theme='dark'] code {
+  background: rgba(230, 122, 92, 0.12);
+}
+
+[data-theme='light'] .token.comment {
+  color: #8a7f73;
+  font-style: italic;
+}
+
+[data-theme='light'] .token.string {
+  color: #8a5a20;
+}
+
+[data-theme='light'] .token.keyword {
+  color: #b6452c;
+}
+
+[data-theme='light'] .token.function {
+  color: #6b4220;
+}
+
+[data-theme='light'] .token.number {
+  color: #b6452c;
 }

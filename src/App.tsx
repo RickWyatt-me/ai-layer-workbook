@@ -46,6 +46,14 @@ function Shell() {
           </Routes>
         </main>
       </div>
+      {drawerOpen && (
+        <button
+          type="button"
+          className="sidebar-scrim"
+          aria-label="Close navigation menu"
+          onClick={() => setDrawerOpen(false)}
+        />
+      )}
       <ScrollToTop />
     </div>
   );

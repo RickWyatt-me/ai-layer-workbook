@@ -9,12 +9,22 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
   return (
     <aside id="sidebar-nav" className="sidebar" aria-label="Workbook sections">
       <div className="brand">
-        <div className="brand-title">
-          The AI Layer
-          <br />
-          Workbook
+        <div>
+          <div className="brand-title">
+            The AI Layer
+            <br />
+            Workbook
+          </div>
+          <div className="brand-sub">A field guide · v1.0</div>
         </div>
-        <div className="brand-sub">A field guide · v1.0</div>
+        <button
+          type="button"
+          className="drawer-close icon-btn"
+          aria-label="Close navigation menu"
+          onClick={() => onNavigate?.()}
+        >
+          ✕
+        </button>
       </div>
 
       {NAV_GROUPS.map((group) => (

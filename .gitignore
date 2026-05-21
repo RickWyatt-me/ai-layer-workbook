@@ -20,6 +20,10 @@ yarn-error.log*
 # Brain corpus extraction artifacts
 graphify-out/
 
+# Playwright MCP verification screenshots
+verify-*.png
+.playwright-mcp/
+
 # Local env / secrets
 .env
 .env.local
