@@ -1,3 +1,4 @@
+import AuditCard from '../components/AuditCard';
 import Checklist from '../components/Checklist';
 import CodeBlock from '../components/CodeBlock';
 import TplAgent from '../components/TplAgent';
@@ -78,6 +79,12 @@ paragraph at the end explaining your reasoning for the ordering.
 
       <h4>Discovery prompt</h4>
       <CodeBlock lang="markdown">{discoveryPrompt}</CodeBlock>
+
+      <p>
+        Or — if you've pasted your repo URL and added an Anthropic API key — run
+        the audit right here:
+      </p>
+      <AuditCard />
 
       <h2>Step 3 — Read the output critically</h2>
       <p>

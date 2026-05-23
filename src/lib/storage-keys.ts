@@ -1,6 +1,7 @@
 export const STORAGE_KEYS = {
   theme: 'aiLayer.theme',
   agent: 'aiLayer.agent',
+  audit: 'aiLayer.audit',
   repo: 'aiLayer.repo',
   settings: 'aiLayer.settings',
   persona: 'workbook:persona',
